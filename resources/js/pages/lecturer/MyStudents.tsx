@@ -63,12 +63,13 @@ export const MyStudents: React.FC = () => {
               { 
                 header: 'Evaluation Status', 
                 accessor: (row) => {
-                  const hasLecturerEvaluation = row.evaluations?.some((e: any) => e.evaluator_type === 'LECTURER' && e.status === 'SUBMITTED');
-                  return hasLecturerEvaluation ? (
-                    <Badge variant="success">Completed</Badge>
-                  ) : (
-                    <Badge variant="warning">Pending</Badge>
-                  );
+                  const status = row.lecturer_grade?.status;
+                  if (status === 'SUBMITTED') {
+                    return <Badge variant="success">Completed</Badge>;
+                  } else if (status === 'DRAFT') {
+                    return <Badge variant="info">Draft</Badge>;
+                  }
+                  return <Badge variant="warning">Pending</Badge>;
                 }
               },
               {

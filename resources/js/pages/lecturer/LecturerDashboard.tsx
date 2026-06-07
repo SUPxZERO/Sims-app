@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
@@ -27,6 +28,7 @@ ChartJS.register(
 );
 
 export const LecturerDashboard: React.FC = () => {
+  const navigate = useNavigate();
   // Using true to autoFetch on mount. Assuming backend role handles data filtering.
   const { data, loading, error } = useFetch<any>('/dashboard', true);
 
@@ -201,7 +203,7 @@ export const LecturerDashboard: React.FC = () => {
                 },
                 { 
                   header: 'Action', 
-                  accessor: () => <button className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">Review</button>
+                  accessor: (row) => <button onClick={() => navigate(`/lecturer/reports/${row.report_id}`)} className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">Review</button>
                 }
               ]}
               emptyMessage="No pending reports to review."

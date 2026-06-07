@@ -47,10 +47,26 @@ class WeeklyReportController extends Controller
         }
     }
 
+    public function lecturerReports(Request $request)
+    {
+        $user = $request->user();
+
+        try {
+            $reports = $this->weeklyReportService->getLecturerReports($user);
+            return response()->json([
+                'reports' => $reports
+            ], 200);
+        } catch (Exception $e) {
+            $code = $e->getCode() ?: 400;
+            if ($code < 100 || $code > 599) $code = 400;
+            return response()->json(['error' => $e->getMessage()], $code);
+        }
+    }
+
     public function show(Request $request, $id)
     {
         try {
-            $report = \App\Models\WeeklyReport::with(['internship'])->findOrFail($id);
+            $report = \App\Models\WeeklyReport::with(['internship.studentProfile.user', 'internship.companyProfile'])->findOrFail($id);
             return response()->json([
                 'report' => $report
             ], 200);

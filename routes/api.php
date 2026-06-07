@@ -94,6 +94,7 @@ Route::middleware('auth.jwt')->group(function () {
     // Weekly Reports Routes
     Route::prefix('reports')->group(function () {
         Route::get('/my', [WeeklyReportController::class, 'myReports']);
+        Route::get('/lecturer', [WeeklyReportController::class, 'lecturerReports']);
         Route::get('/{id}', [WeeklyReportController::class, 'show']);
         Route::put('/{id}', [WeeklyReportController::class, 'save']);
         Route::post('/{id}/attachments', [WeeklyReportController::class, 'addAttachment']);

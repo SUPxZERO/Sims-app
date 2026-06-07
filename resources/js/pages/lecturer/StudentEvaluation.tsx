@@ -27,23 +27,23 @@ export const StudentEvaluation: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   
   const internship = internshipData?.internship;
-  const existingEval = internship?.evaluations?.find((e: any) => e.evaluator_type === 'LECTURER');
-  const finalGrade = gradeData?.final_grade;
+  const existingEval = internship?.lecturer_grade;
+  const finalGrade = gradeData?.final_score;
 
   // Initialize form if there is a drafted evaluation
   useEffect(() => {
     if (existingEval && !scores.report_quality_score) {
       setScores({
-        report_quality_score: existingEval.scores?.report_quality_score?.toString() || '',
-        presentation_score: existingEval.scores?.presentation_score?.toString() || '',
-        engagement_score: existingEval.scores?.engagement_score?.toString() || '',
+        report_quality_score: existingEval.report_quality_score?.toString() || '',
+        presentation_score: existingEval.presentation_score?.toString() || '',
+        engagement_score: existingEval.engagement_score?.toString() || '',
         overall_comments: existingEval.overall_comments || '',
       });
     }
   }, [existingEval]);
 
   const isSubmitted = existingEval?.status === 'SUBMITTED';
-  const companyEval = internship?.evaluations?.find((e: any) => e.evaluator_type === 'COMPANY' && e.status === 'SUBMITTED');
+  const companyEval = internship?.company_evaluation?.status === 'SUBMITTED' ? internship.company_evaluation : null;
 
   if (internshipLoading) {
     return (
@@ -213,11 +213,11 @@ export const StudentEvaluation: React.FC = () => {
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-slate-500 block">Composite Score</span>
-                  <span className="text-slate-300 font-medium">{companyEval.scores?.composite_score}/100</span>
+                  <span className="text-slate-300 font-medium">{companyEval.composite_score}/100</span>
                 </div>
                 <div>
                   <span className="text-slate-500 block">Hiring Recommendation</span>
-                  <span className="text-slate-300 font-medium">{companyEval.scores?.hiring_recommendation?.replace(/_/g, ' ')}</span>
+                  <span className="text-slate-300 font-medium">{companyEval.hiring_recommendation?.replace(/_/g, ' ')}</span>
                 </div>
               </div>
             </Card>

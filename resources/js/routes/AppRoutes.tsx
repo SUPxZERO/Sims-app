@@ -23,6 +23,7 @@ import StudentProfile from '../pages/student/StudentProfile';
 // Lecturer Pages
 import LecturerDashboard from '../pages/lecturer/LecturerDashboard';
 import ReportReview from '../pages/lecturer/ReportReview';
+import LecturerReports from '../pages/lecturer/LecturerReports';
 import MyStudents from '../pages/lecturer/MyStudents';
 import StudentEvaluation from '../pages/lecturer/StudentEvaluation';
 import LecturerProfile from '../pages/lecturer/LecturerProfile';
@@ -85,6 +86,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="lecturer/dashboard" element={<ProtectedRoute allowedRoles={['LECTURER']}><LecturerDashboard /></ProtectedRoute>} />
         <Route path="lecturer/students" element={<ProtectedRoute allowedRoles={['LECTURER']}><MyStudents /></ProtectedRoute>} />
         <Route path="lecturer/interns/:id/evaluate" element={<ProtectedRoute allowedRoles={['LECTURER']}><StudentEvaluation /></ProtectedRoute>} />
+        <Route path="lecturer/reports" element={<ProtectedRoute allowedRoles={['LECTURER']}><LecturerReports /></ProtectedRoute>} />
         <Route path="lecturer/reports/:id" element={<ProtectedRoute allowedRoles={['LECTURER']}><ReportReview /></ProtectedRoute>} />
         <Route path="lecturer/profile" element={<ProtectedRoute allowedRoles={['LECTURER']}><LecturerProfile /></ProtectedRoute>} />
 

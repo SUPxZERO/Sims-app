@@ -168,4 +168,21 @@ class WeeklyReportService
             ->orderBy('week_number', 'asc')
             ->get();
     }
+
+    /**
+     * Get all reports for the authenticated lecturer
+     */
+    public function getLecturerReports(User $user)
+    {
+        if ($user->role !== 'LECTURER') {
+            throw new Exception("Unauthorized access.", 403);
+        }
+
+        return WeeklyReport::whereHas('internship', function($q) use ($user) {
+                $q->where('lecturer_user_id', $user->user_id);
+            })
+            ->with(['internship.studentProfile.user', 'internship.companyProfile'])
+            ->orderBy('submitted_at', 'desc')
+            ->get();
+    }
 }

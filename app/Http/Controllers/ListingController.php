@@ -71,7 +71,30 @@ class ListingController extends Controller
     {
         try {
             $filters = $request->only(['status', 'company_user_id']);
+            $user = auth()->user();
+            
+            if ($user->role === 'STUDENT') {
+                $filters['status'] = 'PUBLISHED';
+            }
+
             $listings = $this->listingService->getListings($filters);
+
+            if ($user->role === 'STUDENT') {
+                $scores = \App\Models\RecommendationScore::where('user_id', $user->user_id)
+                    ->get()
+                    ->keyBy('listing_id');
+                
+                $listings->each(function($listing) use ($scores) {
+                    if ($scores->has($listing->listing_id)) {
+                        $listing->match_details = $scores->get($listing->listing_id);
+                        $listing->match_score = $listing->match_details->composite_score;
+                    } else {
+                        $listing->match_details = null;
+                        $listing->match_score = null;
+                    }
+                });
+            }
+
             return response()->json(['listings' => $listings]);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);

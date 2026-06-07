@@ -65,7 +65,7 @@ export const ReportReview: React.FC = () => {
         </button>
         <div>
           <h1 className="text-2xl font-bold text-slate-100">Review Weekly Report</h1>
-          <p className="text-slate-400">{report.student_name || 'Student'} • Week {report.week_number}</p>
+          <p className="text-slate-400">{report.internship?.student_profile?.user?.full_name || 'Student'} • Week {report.week_number}</p>
         </div>
       </div>
 
@@ -75,11 +75,11 @@ export const ReportReview: React.FC = () => {
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
-                  {(report.student_name || 'S').charAt(0)}
+                  {(report.internship?.student_profile?.user?.full_name || 'S').charAt(0)}
                 </div>
                 <div>
-                  <h3 className="text-slate-200 font-medium">{report.student_name || 'Student Name'}</h3>
-                  <p className="text-xs text-slate-400">{report.company_name || 'Company'}</p>
+                  <h3 className="text-slate-200 font-medium">{report.internship?.student_profile?.user?.full_name || 'Student Name'}</h3>
+                  <p className="text-xs text-slate-400">{report.internship?.company_profile?.company_name || 'Company'}</p>
                 </div>
               </div>
               <div className="text-right">
@@ -124,40 +124,52 @@ export const ReportReview: React.FC = () => {
               <span className="font-bold text-slate-200">{report.hours_logged || 0} hrs</span>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Feedback / Revision Notes
-                </label>
-                <textarea 
-                  className="input-field min-h-[120px] w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-blue-500" 
-                  placeholder="Enter feedback for the student..."
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                ></textarea>
-                <p className="text-xs text-slate-500 mt-2">
-                  Required if requesting a revision. (Current revisions: {report.revision_count || 0}/3)
+            {report.status === 'SUBMITTED' ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Feedback / Revision Notes
+                  </label>
+                  <textarea 
+                    className="input-field min-h-[120px] w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-blue-500" 
+                    placeholder="Enter feedback for the student..."
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                  ></textarea>
+                  <p className="text-xs text-slate-500 mt-2">
+                    Required if requesting a revision. (Current revisions: {report.revision_count || 0}/3)
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3 pt-4 border-t border-slate-800">
+                  <Button 
+                    variant="success" 
+                    className="w-full"
+                    onClick={() => handleAction('approve')}
+                  >
+                    Approve Report
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    className="w-full"
+                    disabled={!feedback.trim() || (report.revision_count || 0) >= 3}
+                    onClick={() => handleAction('revise')}
+                  >
+                    Request Revision
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-800 text-center">
+                <p className="text-slate-400 text-sm">
+                  {report.status === 'NOT_STARTED' && "This report has not been started by the student yet."}
+                  {report.status === 'DRAFT' && "This report is currently being drafted by the student."}
+                  {report.status === 'APPROVED' && "This report has already been approved."}
+                  {report.status === 'REVISION_REQUESTED' && "A revision has been requested for this report."}
+                  {report.status === 'REJECTED' && "This report has been rejected."}
                 </p>
               </div>
-
-              <div className="flex flex-col gap-3 pt-4 border-t border-slate-800">
-                <Button 
-                  variant="success" 
-                  className="w-full"
-                  onClick={() => handleAction('approve')}
-                >
-                  Approve Report
-                </Button>
-                <Button 
-                  variant="secondary" 
-                  className="w-full"
-                  disabled={!feedback.trim() || (report.revision_count || 0) >= 3}
-                  onClick={() => handleAction('revise')}
-                >
-                  Request Revision
-                </Button>
-              </div>
-            </div>
+            )}
           </Card>
         </div>
       </div>

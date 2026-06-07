@@ -13,7 +13,7 @@ class InternshipService
      */
     public function getInternships(User $user)
     {
-        $query = Internship::with(['studentProfile.user', 'companyProfile.user', 'lecturerProfile.user', 'listing']);
+        $query = Internship::with(['studentProfile.user', 'companyProfile.user', 'lecturerProfile.user', 'listing', 'lecturerGrade']);
 
         if ($user->role === 'STUDENT') {
             $query->where('student_user_id', $user->user_id);
@@ -31,7 +31,7 @@ class InternshipService
      */
     public function getInternshipById(User $user, int $internshipId): Internship
     {
-        $internship = Internship::with(['studentProfile.user', 'companyProfile.user', 'lecturerProfile.user', 'listing', 'weeklyReports.reviews', 'companyEvaluation.scores', 'lecturerGrade'])->findOrFail($internshipId);
+        $internship = Internship::with(['studentProfile.user', 'companyProfile.user', 'lecturerProfile.user', 'listing', 'weeklyReports.reviews', 'companyEvaluation.criteriaScores', 'lecturerGrade'])->findOrFail($internshipId);
 
         // Check permissions
         if ($user->role === 'STUDENT' && $internship->student_user_id !== $user->user_id) {
