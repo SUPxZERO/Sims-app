@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useFetch } from '../../hooks/useFetch';
 import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
@@ -21,6 +22,27 @@ export const CreateListing: React.FC = () => {
     preferred_departments: ''
   });
 
+  const [skills, setSkills] = useState<{ skill_id: number; skill_name: string; importance: string }[]>([]);
+  const { data: categoriesData } = useFetch<any[]>('/skills', true);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [newSkillId, setNewSkillId] = useState('');
+  const [importance, setImportance] = useState('MANDATORY');
+
+  const handleAddSkill = () => {
+    if (newSkillId && !skills.find(s => s.skill_id.toString() === newSkillId)) {
+      const category = categoriesData?.find((c: any) => c.skill_category_id.toString() === selectedCategory);
+      const skill = category?.skills.find((s: any) => s.skill_id.toString() === newSkillId);
+      if (skill) {
+        setSkills([...skills, { skill_id: skill.skill_id, skill_name: skill.skill_name, importance }]);
+        setNewSkillId('');
+      }
+    }
+  };
+
+  const removeSkill = (id: number) => {
+    setSkills(skills.filter(s => s.skill_id !== id));
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -31,6 +53,7 @@ export const CreateListing: React.FC = () => {
     try {
       await api.post('/listings', {
         ...formData,
+        skills: skills.map(s => ({ skill_id: s.skill_id, importance: s.importance })),
         duration_weeks: parseInt(formData.duration_weeks as unknown as string, 10),
         quota: parseInt(formData.quota as unknown as string, 10),
         min_gpa: formData.min_gpa ? parseFloat(formData.min_gpa) : null
@@ -86,15 +109,83 @@ export const CreateListing: React.FC = () => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-300 mb-1">Requirements & Skills *</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1">General Requirements (Optional)</label>
               <textarea 
                 className="input-field min-h-[100px]" 
                 name="requirements"
-                placeholder="List required technical skills, soft skills, or prior knowledge..."
+                placeholder="Additional details not covered by specific skills..."
                 value={formData.requirements}
                 onChange={handleChange}
-                required
               ></textarea>
+            </div>
+
+            <div className="md:col-span-2 space-y-4">
+              <label className="block text-sm font-medium text-slate-300 mb-1">Required Skills *</label>
+              
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <label className="block text-xs text-slate-400 mb-1">Category</label>
+                  <select 
+                    className="input-field"
+                    value={selectedCategory}
+                    onChange={(e) => {
+                      setSelectedCategory(e.target.value);
+                      setNewSkillId('');
+                    }}
+                  >
+                    <option value="">Select Category</option>
+                    {categoriesData?.map((cat: any) => (
+                      <option key={cat.skill_category_id} value={cat.skill_category_id}>
+                        {cat.category_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs text-slate-400 mb-1">Skill</label>
+                  <select 
+                    className="input-field"
+                    value={newSkillId}
+                    onChange={(e) => setNewSkillId(e.target.value)}
+                    disabled={!selectedCategory}
+                  >
+                    <option value="">Select Skill</option>
+                    {categoriesData?.find((c: any) => c.skill_category_id.toString() === selectedCategory)?.skills.map((skill: any) => (
+                      <option key={skill.skill_id} value={skill.skill_id}>
+                        {skill.skill_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-48">
+                  <label className="block text-xs text-slate-400 mb-1">Importance</label>
+                  <select 
+                    className="input-field"
+                    value={importance}
+                    onChange={(e) => setImportance(e.target.value)}
+                  >
+                    <option value="MANDATORY">Mandatory</option>
+                    <option value="HIGH">High</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="LOW">Low</option>
+                  </select>
+                </div>
+                <Button type="button" onClick={handleAddSkill} disabled={!newSkillId}>Add</Button>
+              </div>
+
+              {skills.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {skills.map(skill => (
+                    <div key={skill.skill_id} className="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full text-sm">
+                      <span className="text-slate-200">{skill.skill_name}</span>
+                      <span className="text-xs text-blue-400">({skill.importance})</span>
+                      <button type="button" onClick={() => removeSkill(skill.skill_id)} className="text-slate-400 hover:text-red-400 ml-1">
+                        &times;
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <Input 

@@ -8,6 +8,7 @@ import Input from '../../components/common/Input';
 export const CVBuilder: React.FC = () => {
   const [personalSummary, setPersonalSummary] = useState('');
   const [skills, setSkills] = useState<{ name: string; proficiency: string }[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [newSkill, setNewSkill] = useState('');
   const [proficiency, setProficiency] = useState('BEGINNER');
 
@@ -21,6 +22,7 @@ export const CVBuilder: React.FC = () => {
   const [expForm, setExpForm] = useState({ company_name: '', position_title: '', start_date: '', end_date: '', description: '' });
 
   const { data, loading, refetch } = useFetch<any>('/cv', true);
+  const { data: categoriesData } = useFetch<any[]>('/skills', true);
 
   useEffect(() => {
     if (data) {
@@ -231,12 +233,38 @@ export const CVBuilder: React.FC = () => {
             <h2 className="text-lg font-outfit font-semibold text-slate-100 mb-4">Skills</h2>
             <form onSubmit={handleAddSkill} className="flex gap-4 items-end">
               <div className="flex-1">
-                <Input
-                  label="Skill Name"
-                  placeholder="e.g. React, Python, Data Analysis"
+                <label className="block text-sm font-medium text-slate-300 mb-1">Category</label>
+                <select 
+                  className="input-field"
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    setNewSkill('');
+                  }}
+                >
+                  <option value="">Select Category</option>
+                  {categoriesData?.map((cat: any) => (
+                    <option key={cat.skill_category_id} value={cat.skill_category_id}>
+                      {cat.category_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-slate-300 mb-1">Skill</label>
+                <select 
+                  className="input-field"
                   value={newSkill}
                   onChange={(e) => setNewSkill(e.target.value)}
-                />
+                  disabled={!selectedCategory}
+                >
+                  <option value="">Select Skill</option>
+                  {categoriesData?.find((c: any) => c.skill_category_id.toString() === selectedCategory.toString())?.skills.map((skill: any) => (
+                    <option key={skill.skill_id} value={skill.skill_name}>
+                      {skill.skill_name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="w-48">
                 <label className="block text-sm font-medium text-slate-300 mb-1">Proficiency</label>

@@ -11,6 +11,7 @@ use App\Http\Controllers\WeeklyReportController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SkillController;
 
 // Auth Routes
 Route::prefix('auth')->group(function () {
@@ -109,6 +110,9 @@ Route::middleware('auth.jwt')->group(function () {
         Route::get('/', [ProfileController::class, 'show']);
         Route::put('/', [ProfileController::class, 'update']);
     });
+
+    // Skills
+    Route::get('/skills', [SkillController::class, 'index']);
 
     // User Management
     Route::prefix('users')->group(function () {

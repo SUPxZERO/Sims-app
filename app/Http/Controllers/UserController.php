@@ -112,7 +112,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'role' => 'required|in:STUDENT,COMPANY,LECTURER,ADMIN',
-            'status' => 'required|in:ACTIVE,PENDING,SUSPENDED'
+            'status' => 'required|in:ACTIVE,INACTIVE,LOCKED'
         ]);
 
         try {
@@ -146,7 +146,7 @@ class UserController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:ACTIVE,PENDING,SUSPENDED'
+            'status' => 'required|in:ACTIVE,INACTIVE,LOCKED'
         ]);
 
         try {

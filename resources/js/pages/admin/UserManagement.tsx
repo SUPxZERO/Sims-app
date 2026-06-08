@@ -114,16 +114,16 @@ export const UserManagement: React.FC = () => {
   const getStatusDisplay = (status: string) => {
     switch(status) {
       case 'ACTIVE': return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/10"><CheckCircle2 size={12} className="mr-1" /> Active</span>;
-      case 'SUSPENDED': return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-sm shadow-rose-500/10"><XCircle size={12} className="mr-1" /> Suspended</span>;
-      case 'PENDING': return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-sm shadow-amber-500/10"><Clock size={12} className="mr-1" /> Pending</span>;
+      case 'LOCKED': return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-sm shadow-rose-500/10"><XCircle size={12} className="mr-1" /> Locked</span>;
+      case 'INACTIVE': return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-sm shadow-amber-500/10"><Clock size={12} className="mr-1" /> Inactive</span>;
       default: return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-500/10 text-slate-400 border border-slate-500/20">{status}</span>;
     }
   };
 
   const totalUsers = usersData.length;
   const activeUsers = usersData.filter(u => u.status === 'ACTIVE').length;
-  const pendingUsers = usersData.filter(u => u.status === 'PENDING').length;
-  const suspendedUsers = usersData.filter(u => u.status === 'SUSPENDED').length;
+  const inactiveUsers = usersData.filter(u => u.status === 'INACTIVE').length;
+  const lockedUsers = usersData.filter(u => u.status === 'LOCKED').length;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 relative">
@@ -192,8 +192,8 @@ export const UserManagement: React.FC = () => {
                     className="w-full px-4 py-2.5 bg-slate-950/50 border border-slate-700/50 rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer"
                   >
                     <option value="ACTIVE">Active</option>
-                    <option value="PENDING">Pending</option>
-                    <option value="SUSPENDED">Suspended</option>
+                    <option value="INACTIVE">Inactive</option>
+                    <option value="LOCKED">Locked</option>
                   </select>
                 </div>
               </div>
@@ -324,8 +324,8 @@ export const UserManagement: React.FC = () => {
         {[
           { label: 'Total Users', value: totalUsers, icon: <Users size={20} />, color: 'from-blue-500/20 to-blue-600/5', text: 'text-blue-400' },
           { label: 'Active Now', value: activeUsers, icon: <Activity size={20} />, color: 'from-emerald-500/20 to-emerald-600/5', text: 'text-emerald-400' },
-          { label: 'Pending Approval', value: pendingUsers, icon: <Clock size={20} />, color: 'from-amber-500/20 to-amber-600/5', text: 'text-amber-400' },
-          { label: 'Suspended', value: suspendedUsers, icon: <XCircle size={20} />, color: 'from-rose-500/20 to-rose-600/5', text: 'text-rose-400' }
+          { label: 'Inactive', value: inactiveUsers, icon: <Clock size={20} />, color: 'from-amber-500/20 to-amber-600/5', text: 'text-amber-400' },
+          { label: 'Locked', value: lockedUsers, icon: <XCircle size={20} />, color: 'from-rose-500/20 to-rose-600/5', text: 'text-rose-400' }
         ].map((stat, i) => (
           <div key={i} className={`p-5 rounded-2xl border border-slate-800/60 bg-gradient-to-br ${stat.color} backdrop-blur-xl relative overflow-hidden group`}>
             <div className="flex justify-between items-start relative z-10">
@@ -387,8 +387,8 @@ export const UserManagement: React.FC = () => {
               >
                 <option value="ALL">All Statuses</option>
                 <option value="ACTIVE">Active</option>
-                <option value="PENDING">Pending</option>
-                <option value="SUSPENDED">Suspended</option>
+                <option value="INACTIVE">Inactive</option>
+                <option value="LOCKED">Locked</option>
               </select>
             </div>
           </div>
@@ -452,17 +452,17 @@ export const UserManagement: React.FC = () => {
                         <button type="button" onClick={() => handleEdit(user)} className="p-1.5 text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors" title="Edit User">
                           <Edit2 size={16} />
                         </button>
-                        {user.status === 'PENDING' && (
+                        {user.status === 'INACTIVE' && (
                           <button type="button" onClick={() => handleStatusChange(user.id, 'ACTIVE')} className="p-1.5 text-emerald-400 hover:bg-emerald-400/10 rounded-lg transition-colors" title="Approve User">
                             <CheckCircle2 size={16} />
                           </button>
                         )}
                         {user.status === 'ACTIVE' && (
-                          <button type="button" onClick={() => handleStatusChange(user.id, 'SUSPENDED')} className="p-1.5 text-rose-400 hover:bg-rose-400/10 rounded-lg transition-colors" title="Suspend User">
+                          <button type="button" onClick={() => handleStatusChange(user.id, 'LOCKED')} className="p-1.5 text-rose-400 hover:bg-rose-400/10 rounded-lg transition-colors" title="Lock User">
                             <Ban size={16} />
                           </button>
                         )}
-                        {user.status === 'SUSPENDED' && (
+                        {user.status === 'LOCKED' && (
                           <button type="button" onClick={() => handleStatusChange(user.id, 'ACTIVE')} className="p-1.5 text-emerald-400 hover:bg-emerald-400/10 rounded-lg transition-colors" title="Activate User">
                             <Play size={16} />
                           </button>
