@@ -14,9 +14,16 @@ export const CVBuilder: React.FC = () => {
 
   const [educations, setEducations] = useState<any[]>([]);
   const [experiences, setExperiences] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [versions, setVersions] = useState<any[]>([]);
+  const [visibility, setVisibility] = useState('PRIVATE');
+
+  // Document form state
+  const [docFile, setDocFile] = useState<File | null>(null);
+  const [docLabel, setDocLabel] = useState('');
 
   // Education form state
-  const [eduForm, setEduForm] = useState({ institution_name: '', degree: '', field_of_study: '', start_date: '', end_date: '', description: '' });
+  const [eduForm, setEduForm] = useState({ institution_name: '', degree: '', field_of_study: '', start_date: '', end_date: '', description: '', gpa: '' });
   
   // Experience form state
   const [expForm, setExpForm] = useState({ company_name: '', position_title: '', start_date: '', end_date: '', description: '' });
@@ -40,8 +47,12 @@ export const CVBuilder: React.FC = () => {
       }
 
       if (data.experiences) {
-        setExperiences(data.experiences);
+        setExperiences(data.experiences.sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0)));
       }
+
+      if (data.documents) setDocuments(data.documents);
+      if (data.versions) setVersions(data.versions.sort((a: any, b: any) => b.version_number - a.version_number));
+      if (data.visibility) setVisibility(data.visibility);
     }
   }, [data]);
 
@@ -74,11 +85,84 @@ export const CVBuilder: React.FC = () => {
     }
   };
 
+  const handleVisibilityChange = async (newVisibility: string) => {
+    try {
+      await api.post('/cv/visibility', { visibility: newVisibility });
+      setVisibility(newVisibility);
+    } catch (err: any) {
+      alert('Failed to update visibility: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleAddDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!docFile || !docLabel) return;
+    
+    const formData = new FormData();
+    formData.append('file', docFile);
+    formData.append('document_label', docLabel);
+
+    try {
+      await api.post('/cv/documents', formData);
+      setDocFile(null);
+      setDocLabel('');
+      refetch();
+    } catch (err: any) {
+      alert('Failed to upload document: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleDeleteDocument = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this document?')) return;
+    try {
+      await api.delete(`/cv/documents/${id}`);
+      refetch();
+    } catch (err: any) {
+      alert('Failed to delete document: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const moveExperience = async (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= experiences.length) return;
+    
+    const curr = experiences[index];
+    const target = experiences[targetIndex];
+    
+    try {
+      await api.put(`/cv/experiences/${curr.cv_experience_id}`, { sort_order: targetIndex });
+      await api.put(`/cv/experiences/${target.cv_experience_id}`, { sort_order: index });
+      refetch();
+    } catch (err) {
+      alert('Failed to reorder');
+    }
+  };
+
+  const moveEducation = async (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= educations.length) return;
+    
+    const curr = educations[index];
+    const target = educations[targetIndex];
+    
+    try {
+      await api.put(`/cv/educations/${curr.cv_education_id}`, { sort_order: targetIndex });
+      await api.put(`/cv/educations/${target.cv_education_id}`, { sort_order: index });
+      refetch();
+    } catch (err) {
+      alert('Failed to reorder');
+    }
+  };
+
   const handleAddEducation = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/cv/educations', eduForm);
-      setEduForm({ institution_name: '', degree: '', field_of_study: '', start_date: '', end_date: '', description: '' });
+      await api.post('/cv/educations', {
+        ...eduForm,
+        gpa: eduForm.gpa ? parseFloat(eduForm.gpa) : null,
+        sort_order: educations.length
+      });
+      setEduForm({ institution_name: '', degree: '', field_of_study: '', start_date: '', end_date: '', description: '', gpa: '' });
       refetch();
     } catch (err: any) {
       alert('Failed to add education: ' + (err.response?.data?.error || err.message));
@@ -98,7 +182,10 @@ export const CVBuilder: React.FC = () => {
   const handleAddExperience = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/cv/experiences', expForm);
+      await api.post('/cv/experiences', {
+        ...expForm,
+        sort_order: experiences.length
+      });
       setExpForm({ company_name: '', position_title: '', start_date: '', end_date: '', description: '' });
       refetch();
     } catch (err: any) {
@@ -143,14 +230,15 @@ export const CVBuilder: React.FC = () => {
             
             {experiences.length > 0 && (
               <div className="space-y-4 mb-6">
-                {experiences.map((exp: any) => (
+                {experiences.map((exp: any, index: number) => (
                   <div key={exp.cv_experience_id} className="p-4 bg-slate-800/50 rounded-lg border border-slate-700 relative group">
-                    <button 
-                      onClick={() => handleDeleteExperience(exp.cv_experience_id)}
-                      className="absolute top-4 right-4 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      &times; Delete
-                    </button>
+                    <div className="absolute top-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button type="button" onClick={() => moveExperience(index, 'up')} disabled={index === 0} className="text-slate-400 hover:text-blue-400 disabled:opacity-30" title="Move Up">↑</button>
+                      <button type="button" onClick={() => moveExperience(index, 'down')} disabled={index === experiences.length - 1} className="text-slate-400 hover:text-blue-400 disabled:opacity-30" title="Move Down">↓</button>
+                      <button type="button" onClick={() => handleDeleteExperience(exp.cv_experience_id)} className="text-slate-500 hover:text-red-400 ml-2">
+                        &times; Delete
+                      </button>
+                    </div>
                     <h3 className="font-bold text-slate-200">{exp.position_title}</h3>
                     <p className="text-slate-400 text-sm">{exp.company_name}</p>
                     <p className="text-slate-500 text-xs mt-1">
@@ -188,18 +276,19 @@ export const CVBuilder: React.FC = () => {
             
             {educations.length > 0 && (
               <div className="space-y-4 mb-6">
-                {educations.map((edu: any) => (
+                {educations.map((edu: any, index: number) => (
                   <div key={edu.cv_education_id} className="p-4 bg-slate-800/50 rounded-lg border border-slate-700 relative group">
-                    <button 
-                      onClick={() => handleDeleteEducation(edu.cv_education_id)}
-                      className="absolute top-4 right-4 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      &times; Delete
-                    </button>
+                    <div className="absolute top-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button type="button" onClick={() => moveEducation(index, 'up')} disabled={index === 0} className="text-slate-400 hover:text-blue-400 disabled:opacity-30" title="Move Up">↑</button>
+                      <button type="button" onClick={() => moveEducation(index, 'down')} disabled={index === educations.length - 1} className="text-slate-400 hover:text-blue-400 disabled:opacity-30" title="Move Down">↓</button>
+                      <button type="button" onClick={() => handleDeleteEducation(edu.cv_education_id)} className="text-slate-500 hover:text-red-400 ml-2">
+                        &times; Delete
+                      </button>
+                    </div>
                     <h3 className="font-bold text-slate-200">{edu.degree} in {edu.field_of_study}</h3>
                     <p className="text-slate-400 text-sm">{edu.institution_name}</p>
                     <p className="text-slate-500 text-xs mt-1">
-                      {edu.start_date} - {edu.end_date || 'Present'}
+                      {edu.start_date} - {edu.end_date || 'Present'} {edu.gpa ? ` | GPA: ${edu.gpa}` : ''}
                     </p>
                     {edu.description && <p className="text-slate-300 text-sm mt-3">{edu.description}</p>}
                   </div>
@@ -216,6 +305,7 @@ export const CVBuilder: React.FC = () => {
                   <Input label="Field of Study" required value={eduForm.field_of_study} onChange={e => setEduForm({...eduForm, field_of_study: e.target.value})} />
                   <Input type="date" label="Start Date" required value={eduForm.start_date} onChange={e => setEduForm({...eduForm, start_date: e.target.value})} />
                   <Input type="date" label="End Date" value={eduForm.end_date} onChange={e => setEduForm({...eduForm, end_date: e.target.value})} />
+                  <Input type="number" step="0.01" min="0" max="4" label="GPA (Optional)" placeholder="e.g. 3.50" value={eduForm.gpa} onChange={e => setEduForm({...eduForm, gpa: e.target.value})} />
                 </div>
                 <textarea
                   placeholder="Additional details (optional)..."
@@ -296,6 +386,51 @@ export const CVBuilder: React.FC = () => {
               )}
             </div>
           </Card>
+
+          {/* Documents */}
+          <Card>
+            <h2 className="text-lg font-outfit font-semibold text-slate-100 mb-4">Documents</h2>
+            
+            {documents.length > 0 && (
+              <div className="space-y-4 mb-6">
+                {documents.map((doc: any) => (
+                  <div key={doc.cv_document_id} className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                    <div>
+                      <h3 className="font-bold text-slate-200">{doc.document_label}</h3>
+                      <p className="text-slate-400 text-sm">{doc.file_name} ({(doc.file_size_bytes / 1024 / 1024).toFixed(2)} MB)</p>
+                    </div>
+                    <button type="button" onClick={() => handleDeleteDocument(doc.cv_document_id)} className="text-slate-500 hover:text-red-400">
+                      &times; Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="border-t border-slate-800 pt-6 mt-6">
+              <h3 className="text-sm font-semibold text-slate-300 mb-4">Add New Document</h3>
+              <form onSubmit={handleAddDocument} className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <Input 
+                    label="Document Label" 
+                    placeholder="e.g. Transcript, Certificate" 
+                    value={docLabel} 
+                    onChange={e => setDocLabel(e.target.value)} 
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-slate-300 mb-1">File (PDF, PNG, JPEG)</label>
+                  <input 
+                    type="file" 
+                    className="input-field text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600"
+                    onChange={e => e.target.files && setDocFile(e.target.files[0])}
+                    accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                  />
+                </div>
+                <Button type="submit" disabled={!docLabel || !docFile}>Upload</Button>
+              </form>
+            </div>
+          </Card>
         </div>
 
         <div className="space-y-6">
@@ -336,6 +471,37 @@ export const CVBuilder: React.FC = () => {
                 </li>
               </ul>
 
+              <div className="pt-4 border-t border-slate-800">
+                <h3 className="text-sm font-semibold text-slate-300 mb-3">CV Visibility</h3>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="visibility" 
+                      value="PUBLIC" 
+                      checked={visibility === 'PUBLIC'}
+                      onChange={() => handleVisibilityChange('PUBLIC')}
+                      className="text-blue-500 focus:ring-blue-500 bg-slate-900 border-slate-700"
+                    />
+                    Public
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="visibility" 
+                      value="PRIVATE" 
+                      checked={visibility === 'PRIVATE'}
+                      onChange={() => handleVisibilityChange('PRIVATE')}
+                      className="text-blue-500 focus:ring-blue-500 bg-slate-900 border-slate-700"
+                    />
+                    Private
+                  </label>
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Public CVs are visible to recruiters in the talent pool. Private CVs are only sent when you apply.
+                </p>
+              </div>
+
               <Button className="w-full mt-4" disabled={loading} onClick={handleSaveProfile}>
                 Save Profile Changes
               </Button>
@@ -343,6 +509,31 @@ export const CVBuilder: React.FC = () => {
                 Note: Education and Experience entries are saved immediately when added.
               </p>
             </div>
+          </Card>
+
+          <Card>
+            <h2 className="text-lg font-outfit font-semibold text-slate-100 mb-4">Version History</h2>
+            <p className="text-xs text-slate-400 mb-4">
+              Every time you update your CV, a new snapshot is created. When you apply to a listing, the company sees the exact snapshot from that time.
+            </p>
+            
+            {versions.length > 0 ? (
+              <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+                {versions.map((ver: any, index: number) => (
+                  <div key={ver.cv_version_id} className={`p-3 rounded-lg border ${index === 0 ? 'bg-blue-900/20 border-blue-800' : 'bg-slate-800/50 border-slate-700'}`}>
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-slate-200 text-sm">Version {ver.version_number}</span>
+                      {index === 0 && <span className="text-[10px] uppercase bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">Current</span>}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {new Date(ver.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">No versions created yet.</p>
+            )}
           </Card>
         </div>
       </div>

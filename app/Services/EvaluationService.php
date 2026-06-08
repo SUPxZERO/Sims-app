@@ -58,6 +58,18 @@ class EvaluationService
 
         $evaluation->save();
 
+        // Save criteria scores
+        if (isset($data['criteria_scores']) && is_array($data['criteria_scores'])) {
+            \App\Models\EvaluationCriteriaScore::where('evaluation_id', $evaluation->evaluation_id)->delete();
+            foreach ($data['criteria_scores'] as $scoreData) {
+                \App\Models\EvaluationCriteriaScore::create([
+                    'evaluation_id' => $evaluation->evaluation_id,
+                    'criteria_id' => $scoreData['criteria_id'],
+                    'score' => $scoreData['score'],
+                ]);
+            }
+        }
+
         $this->checkAndTriggerFinalGrading($internshipId);
 
         return $evaluation;

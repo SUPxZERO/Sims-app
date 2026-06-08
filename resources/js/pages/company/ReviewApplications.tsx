@@ -5,6 +5,9 @@ import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
+import CvViewer from '../../components/cv/CvViewer';
+import Modal from '../../components/common/Modal';
+import ApplicationTimeline from '../../components/common/ApplicationTimeline';
 
 export const ReviewApplications: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,6 +15,7 @@ export const ReviewApplications: React.FC = () => {
   const { data, loading, error, refetch } = useFetch<any>(`/listings/${id}/applications`, true);
   const [updating, setUpdating] = useState<number | null>(null);
   const [expandedApp, setExpandedApp] = useState<number | null>(null);
+  const [timelineAppId, setTimelineAppId] = useState<number | null>(null);
 
   if (loading) {
     return (
@@ -42,6 +46,8 @@ export const ReviewApplications: React.FC = () => {
       setUpdating(null);
     }
   };
+
+
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -117,71 +123,11 @@ export const ReviewApplications: React.FC = () => {
                   </button>
 
                   {expandedApp === app.application_id && app.cv_version?.snapshot_data && (
-                    <div className="mt-4 space-y-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-                      {app.cv_version.snapshot_data.personal_summary && (
-                        <div>
-                          <h4 className="text-sm font-semibold text-slate-200 mb-1">About</h4>
-                          <p className="text-sm text-slate-400">{app.cv_version.snapshot_data.personal_summary}</p>
-                        </div>
-                      )}
-
-                      {app.cv_version.snapshot_data.skills && app.cv_version.snapshot_data.skills.length > 0 && (
-                        <div>
-                          <h4 className="text-sm font-semibold text-slate-200 mb-2">Skills</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {app.cv_version.snapshot_data.skills.map((skill: any) => (
-                              <Badge key={skill.skill_id || skill.name} variant="info">
-                                {skill.name} ({skill.proficiency_level})
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {app.cv_version.snapshot_data.educations && app.cv_version.snapshot_data.educations.length > 0 && (
-                        <div>
-                          <h4 className="text-sm font-semibold text-slate-200 mb-2">Education</h4>
-                          <div className="space-y-3">
-                            {app.cv_version.snapshot_data.educations.map((edu: any, i: number) => (
-                              <div key={i} className="border-l-2 border-blue-500/50 pl-3">
-                                <h5 className="text-sm font-bold text-slate-200">{edu.degree} in {edu.field_of_study}</h5>
-                                <p className="text-xs text-slate-400">{edu.institution_name}</p>
-                                <p className="text-xs text-slate-500">{new Date(edu.start_date).getFullYear()} - {edu.end_date ? new Date(edu.end_date).getFullYear() : 'Present'}</p>
-                                {edu.description && <p className="text-xs text-slate-400 mt-1">{edu.description}</p>}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {app.cv_version.snapshot_data.experiences && app.cv_version.snapshot_data.experiences.length > 0 && (
-                        <div>
-                          <h4 className="text-sm font-semibold text-slate-200 mb-2">Experience</h4>
-                          <div className="space-y-3">
-                            {app.cv_version.snapshot_data.experiences.map((exp: any, i: number) => (
-                              <div key={i} className="border-l-2 border-emerald-500/50 pl-3">
-                                <h5 className="text-sm font-bold text-slate-200">{exp.position_title}</h5>
-                                <p className="text-xs text-slate-400">{exp.company_name}</p>
-                                <p className="text-xs text-slate-500">{new Date(exp.start_date).toLocaleDateString()} - {exp.end_date ? new Date(exp.end_date).toLocaleDateString() : 'Present'}</p>
-                                {exp.description && <p className="text-xs text-slate-400 mt-1">{exp.description}</p>}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {app.student_profile && (
-                        <div className="grid grid-cols-2 gap-4 text-sm mt-4 pt-4 border-t border-slate-700">
-                          <div>
-                            <span className="text-slate-500 block text-xs uppercase">Major</span>
-                            <span className="text-slate-300">{app.student_profile.major || 'N/A'}</span>
-                          </div>
-                          <div>
-                            <span className="text-slate-500 block text-xs uppercase">GPA</span>
-                            <span className="text-slate-300">{app.student_profile.gpa || 'N/A'}</span>
-                          </div>
-                        </div>
-                      )}
+                    <div className="mt-4">
+                      <CvViewer 
+                        cvData={app.cv_version.snapshot_data} 
+                        studentProfile={app.student_profile}
+                      />
                     </div>
                   )}
                 </div>
@@ -204,11 +150,28 @@ export const ReviewApplications: React.FC = () => {
                 >
                   Reject
                 </button>
+                
+                <div className="mt-4 text-center">
+                    <button 
+                      onClick={() => setTimelineAppId(app.application_id)}
+                      className="text-xs text-blue-400 hover:text-blue-300 underline"
+                    >
+                      View History
+                    </button>
+                </div>
               </div>
             </Card>
           ))
         )}
       </div>
+
+      <Modal 
+        isOpen={timelineAppId !== null} 
+        onClose={() => setTimelineAppId(null)} 
+        title="Application History"
+      >
+        {timelineAppId && <ApplicationTimeline applicationId={timelineAppId} />}
+      </Modal>
     </div>
   );
 };

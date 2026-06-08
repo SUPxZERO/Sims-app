@@ -185,4 +185,49 @@ class WeeklyReportService
             ->orderBy('submitted_at', 'desc')
             ->get();
     }
+
+    /**
+     * Download an attachment
+     */
+    public function downloadAttachment(User $user, int $attachmentId)
+    {
+        $attachment = ReportAttachment::findOrFail($attachmentId);
+        $report = WeeklyReport::with('internship')->findOrFail($attachment->report_id);
+
+        if ($user->role === 'STUDENT' && $report->internship->student_user_id !== $user->user_id) {
+            throw new Exception("Unauthorized access.", 403);
+        }
+        if ($user->role === 'COMPANY' && $report->internship->company_user_id !== $user->user_id) {
+            throw new Exception("Unauthorized access.", 403);
+        }
+        if ($user->role === 'LECTURER' && $report->internship->lecturer_user_id !== $user->user_id) {
+            throw new Exception("Unauthorized access.", 403);
+        }
+
+        if (!Storage::disk('local')->exists($attachment->file_path)) {
+            throw new Exception("File not found on disk.", 404);
+        }
+
+        return response()->download(Storage::disk('local')->path($attachment->file_path), $attachment->file_name);
+    }
+
+    /**
+     * Delete an attachment
+     */
+    public function deleteAttachment(User $user, int $attachmentId)
+    {
+        $attachment = ReportAttachment::findOrFail($attachmentId);
+        $report = WeeklyReport::with('internship')->findOrFail($attachment->report_id);
+
+        if ($report->internship->student_user_id !== $user->user_id) {
+            throw new Exception("Unauthorized to delete this attachment.", 403);
+        }
+
+        if (!in_array($report->status, ['NOT_STARTED', 'DRAFT', 'REVISION_REQUESTED'])) {
+            throw new Exception("Cannot delete files from a submitted report.");
+        }
+
+        Storage::disk('local')->delete($attachment->file_path);
+        $attachment->delete();
+    }
 }

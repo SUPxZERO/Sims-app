@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
 import Table from '../../components/common/Table';
+import Modal from '../../components/common/Modal';
+import CvViewer from '../../components/cv/CvViewer';
+import api from '../../services/api';
 
 export const MyStudents: React.FC = () => {
   const navigate = useNavigate();
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
+  const [selectedCv, setSelectedCv] = useState<any>(null);
+  const [loadingCv, setLoadingCv] = useState(false);
+
   // Fetch internships assigned to this lecturer
   const { data, loading, error } = useFetch<any>('/internships', true);
 
@@ -28,6 +35,25 @@ export const MyStudents: React.FC = () => {
   }
 
   const internships = data?.internships || [];
+
+  const handleViewCv = async (studentId: number) => {
+    try {
+      setLoadingCv(true);
+      setSelectedStudentId(studentId);
+      const response = await api.get(`/cv/student/${studentId}`);
+      setSelectedCv(response.data);
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to fetch student CV.');
+      setSelectedStudentId(null);
+    } finally {
+      setLoadingCv(false);
+    }
+  };
+
+  const closeCvModal = () => {
+    setSelectedStudentId(null);
+    setSelectedCv(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -75,12 +101,20 @@ export const MyStudents: React.FC = () => {
               {
                 header: 'Actions',
                 accessor: (row) => (
-                  <button 
-                    onClick={() => navigate(`/lecturer/interns/${row.internship_id}/evaluate`)}
-                    className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
-                  >
-                    Evaluate
-                  </button>
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={() => handleViewCv(row.student_profile?.user_id || row.student?.user_id)}
+                      className="text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors"
+                    >
+                      View CV
+                    </button>
+                    <button 
+                      onClick={() => navigate(`/lecturer/interns/${row.internship_id}/evaluate`)}
+                      className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
+                    >
+                      Evaluate
+                    </button>
+                  </div>
                 )
               }
             ]}
@@ -88,6 +122,28 @@ export const MyStudents: React.FC = () => {
           />
         </div>
       </Card>
+
+      {/* CV Modal */}
+      {selectedStudentId && (
+        <Modal 
+          isOpen={true} 
+          onClose={closeCvModal} 
+          title={`Student CV`}
+          size="4xl"
+        >
+          {loadingCv ? (
+            <div className="flex h-64 items-center justify-center">
+              <Spinner size="lg" />
+            </div>
+          ) : selectedCv ? (
+            <div className="max-h-[70vh] overflow-y-auto px-1 py-4">
+               <CvViewer cvData={selectedCv} studentProfile={selectedCv.user?.student_profile} />
+            </div>
+          ) : (
+            <div className="text-center text-red-400 py-10">Failed to load CV data.</div>
+          )}
+        </Modal>
+      )}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
@@ -14,26 +15,30 @@ interface Toast {
   type: 'success' | 'error' | 'info';
 }
 
-const ToastContainer: React.FC<{ toasts: Toast[]; onRemove: (id: number) => void }> = ({ toasts, onRemove }) => (
-  <div className="fixed top-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none">
-    {toasts.map(t => (
-      <div
-        key={t.id}
-        className={`pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl border backdrop-blur-md transition-all duration-300 min-w-[280px]
-          ${t.type === 'success' ? 'bg-emerald-900/80 border-emerald-500/40 text-emerald-200' : ''}
-          ${t.type === 'error'   ? 'bg-red-900/80    border-red-500/40    text-red-200'     : ''}
-          ${t.type === 'info'    ? 'bg-blue-900/80   border-blue-500/40   text-blue-200'    : ''}
-        `}
-      >
-        <span className="text-xl">
-          {t.type === 'success' ? '✅' : t.type === 'error' ? '❌' : 'ℹ️'}
-        </span>
-        <span className="flex-1 text-sm font-medium">{t.message}</span>
-        <button onClick={() => onRemove(t.id)} className="text-current opacity-60 hover:opacity-100 text-lg leading-none">×</button>
-      </div>
-    ))}
-  </div>
-);
+const ToastContainer: React.FC<{ toasts: Toast[]; onRemove: (id: number) => void }> = ({ toasts, onRemove }) => {
+  if (typeof document === 'undefined') return null;
+  return createPortal(
+    <div className="fixed top-6 right-6 z-[99999] flex flex-col gap-3 pointer-events-none">
+      {toasts.map(t => (
+        <div
+          key={t.id}
+          className={`pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl border backdrop-blur-md transition-all duration-300 min-w-[280px]
+            ${t.type === 'success' ? 'bg-emerald-900/80 border-emerald-500/40 text-emerald-200' : ''}
+            ${t.type === 'error'   ? 'bg-red-900/80    border-red-500/40    text-red-200'     : ''}
+            ${t.type === 'info'    ? 'bg-blue-900/80   border-blue-500/40   text-blue-200'    : ''}
+          `}
+        >
+          <span className="text-xl">
+            {t.type === 'success' ? '✅' : t.type === 'error' ? '❌' : 'ℹ️'}
+          </span>
+          <span className="flex-1 text-sm font-medium">{t.message}</span>
+          <button onClick={() => onRemove(t.id)} className="text-current opacity-60 hover:opacity-100 text-lg leading-none">×</button>
+        </div>
+      ))}
+    </div>,
+    document.body
+  );
+};
 
 // ── Match ring SVG ────────────────────────────────────────────────────────────
 const MatchRing: React.FC<{ score: number | null }> = ({ score }) => {
@@ -162,7 +167,7 @@ export const FindJobs: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-100">Find Internships</h1>
           <p className="text-slate-400">Discover and apply to new opportunities.</p>
         </div>
-        <Button variant="outline" onClick={handleRefreshScores} disabled={refreshing}>
+        <Button variant="secondary" onClick={handleRefreshScores} disabled={refreshing}>
           {refreshing ? 'Refreshing…' : '↻  Refresh Match Scores'}
         </Button>
       </div>
@@ -245,9 +250,9 @@ export const FindJobs: React.FC = () => {
       </div>
 
       {/* ── Detail Modal ── */}
-      {selectedJob && (
+      {selectedJob && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
           onClick={() => setSelectedJob(null)}
         >
           <div
@@ -373,7 +378,7 @@ export const FindJobs: React.FC = () => {
 
             {/* Modal footer */}
             <div className="p-5 border-t border-slate-800 bg-slate-900/60 flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setSelectedJob(null)}>Close</Button>
+              <Button variant="secondary" onClick={() => setSelectedJob(null)}>Close</Button>
               <Button
                 onClick={() => handleApply(selectedJob.listing_id)}
                 disabled={applying === selectedJob.listing_id}
@@ -382,7 +387,8 @@ export const FindJobs: React.FC = () => {
               </Button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

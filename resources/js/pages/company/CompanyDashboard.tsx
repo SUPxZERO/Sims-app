@@ -217,11 +217,19 @@ export const CompanyDashboard: React.FC = () => {
                 },
                 { 
                   header: 'Action', 
-                  accessor: (row) => (
-                    <button className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
-                      {row.evaluation_status === 'COMPLETED' ? 'View' : 'Evaluate'}
-                    </button>
-                  )
+                  accessor: (row) => {
+                    if (row.status !== 'COMPLETED') {
+                      return <span className="text-slate-500 text-xs italic">Awaiting Completion</span>;
+                    }
+                    return (
+                      <button 
+                        onClick={() => navigate(`/company/interns/${row.internship_id}/evaluate`)}
+                        className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
+                      >
+                        {row.evaluation_status === 'COMPLETED' ? 'View' : 'Evaluate'}
+                      </button>
+                    );
+                  }
                 }
               ]}
               emptyMessage="No active interns at the moment."

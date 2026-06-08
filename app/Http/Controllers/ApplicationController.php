@@ -74,4 +74,19 @@ class ApplicationController extends Controller
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
+
+    public function getHistory($id)
+    {
+        try {
+            // Need to retrieve ApplicationStatusHistory for this application
+            $history = \App\Models\ApplicationStatusHistory::with('changer:user_id,full_name,role')
+                ->where('application_id', $id)
+                ->orderBy('changed_at', 'desc')
+                ->get();
+
+            return response()->json(['history' => $history]);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Failed to fetch application history.'], 500);
+        }
+    }
 }

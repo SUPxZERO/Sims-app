@@ -12,13 +12,8 @@ export const InternEvaluation: React.FC = () => {
   const [intern, setIntern] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [scores, setScores] = useState({
-    technical_skills: 5,
-    communication: 5,
-    teamwork: 5,
-    problem_solving: 5,
-    work_ethic: 5
-  });
+  const [criteriaList, setCriteriaList] = useState<any[]>([]);
+  const [scores, setScores] = useState<Record<number, number>>({});
 
   const [feedback, setFeedback] = useState('');
   const [wouldHire, setWouldHire] = useState(false);
@@ -27,39 +22,61 @@ export const InternEvaluation: React.FC = () => {
     const fetchInternship = async () => {
       try {
         const response = await api.get(`/internships/${id}`);
-        // Adjust according to the actual API response structure. 
-        // Here we assume it returns an 'internship' object that has a 'student_name' or similar.
         setIntern(response.data.internship || response.data);
       } catch (error) {
         console.error("Failed to fetch internship details", error);
-      } finally {
-        setIsLoading(false);
       }
     };
+    
+    const fetchCriteria = async () => {
+      try {
+        const response = await api.get('/evaluations/criteria');
+        const list = response.data.criteria || [];
+        setCriteriaList(list);
+        const initialScores: Record<number, number> = {};
+        list.forEach((c: any) => initialScores[c.criteria_id] = 5);
+        setScores(initialScores);
+      } catch (error) {
+        console.error("Failed to fetch criteria", error);
+      }
+    };
+
+    const loadData = async () => {
+      setIsLoading(true);
+      await Promise.all([fetchInternship(), fetchCriteria()]);
+      setIsLoading(false);
+    };
+
     if (id) {
-      fetchInternship();
+      loadData();
     }
   }, [id]);
 
-  const handleScoreChange = (metric: string, value: string) => {
-    setScores(prev => ({ ...prev, [metric]: parseInt(value) || 0 }));
+  const handleScoreChange = (criteriaId: number, value: string) => {
+    setScores(prev => ({ ...prev, [criteriaId]: parseInt(value) || 0 }));
   };
 
   // Calculate composite percentage
   const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
-  const maxPossible = Object.keys(scores).length * 10;
-  const percentage = Math.round((totalScore / maxPossible) * 100);
+  const maxPossible = criteriaList.length > 0 ? criteriaList.length * 10 : 10;
+  const percentage = maxPossible > 0 ? Math.round((totalScore / maxPossible) * 100) : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const criteriaScoresPayload = Object.keys(scores).map(key => ({
+        criteria_id: parseInt(key),
+        score: scores[parseInt(key)]
+      }));
+
       await api.post(`/internships/${id}/evaluations/company`, {
         composite_score: percentage,
         strengths: feedback, 
         improvements: '',
         overall_comments: feedback,
         hiring_recommendation: wouldHire ? 'WOULD_HIRE' : 'WOULD_NOT_HIRE',
-        status: 'SUBMITTED'
+        status: 'SUBMITTED',
+        criteria_scores: criteriaScoresPayload
       });
       alert('Evaluation submitted successfully!');
       navigate('/company/dashboard');
@@ -102,26 +119,20 @@ export const InternEvaluation: React.FC = () => {
               <h2 className="text-lg font-outfit font-semibold text-slate-100 mb-6">Performance Rubric (1-10)</h2>
               
               <div className="space-y-6">
-                {[
-                  { id: 'technical_skills', label: 'Technical & Domain Skills', desc: 'Ability to apply knowledge to practical tasks.' },
-                  { id: 'communication', label: 'Communication', desc: 'Clarity in expressing ideas and reporting progress.' },
-                  { id: 'teamwork', label: 'Teamwork & Collaboration', desc: 'Ability to work effectively with colleagues.' },
-                  { id: 'problem_solving', label: 'Problem Solving', desc: 'Analytical thinking and ability to overcome hurdles.' },
-                  { id: 'work_ethic', label: 'Work Ethic & Professionalism', desc: 'Punctuality, reliability, and attitude.' }
-                ].map(metric => (
-                  <div key={metric.id} className="bg-slate-900/50 p-4 rounded-lg border border-slate-800">
+                {criteriaList.map(criteria => (
+                  <div key={criteria.criteria_id} className="bg-slate-900/50 p-4 rounded-lg border border-slate-800">
                     <div className="flex justify-between items-center mb-2">
                       <div>
-                        <label className="font-medium text-slate-200">{metric.label}</label>
-                        <p className="text-xs text-slate-500">{metric.desc}</p>
+                        <label className="font-medium text-slate-200">{criteria.criteria_name}</label>
+                        <p className="text-xs text-slate-500">{criteria.description}</p>
                       </div>
                       <div className="w-20">
                         <Input 
                           type="number"
                           min="1"
                           max="10"
-                          value={scores[metric.id as keyof typeof scores]}
-                          onChange={(e) => handleScoreChange(metric.id, e.target.value)}
+                          value={scores[criteria.criteria_id] || 5}
+                          onChange={(e) => handleScoreChange(criteria.criteria_id, e.target.value)}
                           required
                         />
                       </div>
@@ -130,8 +141,8 @@ export const InternEvaluation: React.FC = () => {
                       type="range" 
                       min="1" 
                       max="10" 
-                      value={scores[metric.id as keyof typeof scores]} 
-                      onChange={(e) => handleScoreChange(metric.id, e.target.value)}
+                      value={scores[criteria.criteria_id] || 5} 
+                      onChange={(e) => handleScoreChange(criteria.criteria_id, e.target.value)}
                       className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                     />
                   </div>

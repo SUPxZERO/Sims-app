@@ -66,7 +66,7 @@ class WeeklyReportController extends Controller
     public function show(Request $request, $id)
     {
         try {
-            $report = \App\Models\WeeklyReport::with(['internship.studentProfile.user', 'internship.companyProfile'])->findOrFail($id);
+            $report = \App\Models\WeeklyReport::with(['internship.studentProfile.user', 'internship.companyProfile', 'attachments'])->findOrFail($id);
             return response()->json([
                 'report' => $report
             ], 200);
@@ -138,6 +138,31 @@ class WeeklyReportController extends Controller
                 'message' => 'Review submitted successfully',
                 'review' => $review
             ], 200);
+        } catch (Exception $e) {
+            $code = $e->getCode() ?: 400;
+            if ($code < 100 || $code > 599) $code = 400;
+            return response()->json(['error' => $e->getMessage()], $code);
+        }
+    }
+
+    public function downloadAttachment(Request $request, $id)
+    {
+        $user = $request->user();
+        try {
+            return $this->weeklyReportService->downloadAttachment($user, $id);
+        } catch (Exception $e) {
+            $code = $e->getCode() ?: 404;
+            if ($code < 100 || $code > 599) $code = 404;
+            return response()->json(['error' => $e->getMessage()], $code);
+        }
+    }
+
+    public function deleteAttachment(Request $request, $id)
+    {
+        $user = $request->user();
+        try {
+            $this->weeklyReportService->deleteAttachment($user, $id);
+            return response()->json(['message' => 'Attachment deleted successfully'], 200);
         } catch (Exception $e) {
             $code = $e->getCode() ?: 400;
             if ($code < 100 || $code > 599) $code = 400;

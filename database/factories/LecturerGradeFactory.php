@@ -26,7 +26,12 @@ class LecturerGradeFactory extends Factory
             'presentation_score' => $ps,
             'engagement_score' => $es,
             'composite_score' => $comp,
-            'overall_comments' => fake()->paragraph(),
+            'overall_comments' => fake()->randomElement([
+                "The student demonstrated excellent application of theoretical knowledge in a practical setting. Weekly reports were thorough and insightful.",
+                "Good overall performance. The presentation was well-structured, though the technical depth could have been slightly better explained.",
+                "Outstanding engagement throughout the internship. The student showed great initiative and received glowing feedback from the company supervisor.",
+                "Satisfactory completion of the internship requirements. Reports were submitted on time but lacked some critical reflection on the challenges faced."
+            ]),
             'status' => 'SUBMITTED',
             'submitted_at' => now(),
         ];

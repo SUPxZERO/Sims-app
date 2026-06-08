@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFetch } from '../../hooks/useFetch';
 import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
+import Modal from '../../components/common/Modal';
+import ApplicationTimeline from '../../components/common/ApplicationTimeline';
 
 export const MyApplications: React.FC = () => {
   const { data, loading, error, refetch } = useFetch<any>('/applications/student', true);
+  const [timelineAppId, setTimelineAppId] = useState<number | null>(null);
 
   const handleConfirmOffer = async (applicationId: number) => {
     try {
@@ -104,17 +107,33 @@ export const MyApplications: React.FC = () => {
                   <div className="mt-4">
                     <button 
                       onClick={() => handleConfirmOffer(app.application_id)}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-green-900/20"
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-green-900/20 w-full mb-2"
                     >
                       Confirm Offer
                     </button>
                   </div>
                 )}
+                <div className="mt-2 text-right">
+                    <button 
+                      onClick={() => setTimelineAppId(app.application_id)}
+                      className="text-xs text-blue-400 hover:text-blue-300 underline"
+                    >
+                      View History
+                    </button>
+                </div>
               </div>
             </Card>
           ))
         )}
       </div>
+
+      <Modal 
+        isOpen={timelineAppId !== null} 
+        onClose={() => setTimelineAppId(null)} 
+        title="Application History"
+      >
+        {timelineAppId && <ApplicationTimeline applicationId={timelineAppId} />}
+      </Modal>
     </div>
   );
 };

@@ -25,7 +25,12 @@ class StudentProfileFactory extends Factory
             'phone_number' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'linkedin_url' => 'https://linkedin.com/in/' . fake()->slug(),
-            'bio' => fake()->paragraph(),
+            'bio' => fake()->randomElement([
+                "I am a passionate software engineering student with a strong interest in backend development and cloud architecture. In my free time, I enjoy participating in hackathons and contributing to open-source projects.",
+                "Data Science enthusiast with a solid foundation in mathematics and statistics. I love uncovering patterns in complex datasets and building predictive models using Python.",
+                "Aspiring frontend developer who loves creating intuitive and beautiful user interfaces. Experienced with React, Tailwind, and Figma.",
+                "Cybersecurity student dedicated to learning about network defense, ethical hacking, and secure coding practices. Always looking for new CTF challenges."
+            ]),
         ];
     }
 }

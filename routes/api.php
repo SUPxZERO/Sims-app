@@ -12,6 +12,13 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\SystemConfigController;
+use App\Http\Controllers\GradingScaleController;
+use App\Http\Controllers\EvaluationCriteriaController;
+use App\Http\Controllers\MatchingWeightConfigController;
+use App\Http\Controllers\SkillCategoryController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\AuditLogController;
 
 // Auth Routes
 Route::prefix('auth')->group(function () {
@@ -28,9 +35,18 @@ Route::prefix('auth')->group(function () {
 // Protected Business Logic Routes
 Route::middleware('auth.jwt')->group(function () {
     
+    // Notifications
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+    });
+    
     // CV Builder Routes
     Route::prefix('cv')->group(function () {
         Route::get('/', [CvController::class, 'show']);
+        Route::get('/talent-pool', [CvController::class, 'talentPool']);
+        Route::get('/student/{id}', [CvController::class, 'getStudentCv']);
         Route::post('/personal-summary', [CvController::class, 'updatePersonalSummary']);
         Route::post('/visibility', [CvController::class, 'updateVisibility']);
         
@@ -46,6 +62,7 @@ Route::middleware('auth.jwt')->group(function () {
         
         Route::post('/documents', [CvController::class, 'addDocument']);
         Route::delete('/documents/{id}', [CvController::class, 'deleteDocument']);
+        Route::get('/documents/{id}/download', [CvController::class, 'downloadDocument']);
     });
 
     // Recommendation Engine Routes
@@ -74,6 +91,7 @@ Route::middleware('auth.jwt')->group(function () {
     // Applications Routes
     Route::prefix('applications')->group(function () {
         Route::patch('/{id}/status', [ApplicationController::class, 'updateStatus']);
+        Route::get('/{id}/history', [ApplicationController::class, 'getHistory']);
         Route::get('/student', [ApplicationController::class, 'getForStudent']);
         Route::get('/listing/{listingId}', [ApplicationController::class, 'getForListing']);
     });
@@ -92,6 +110,11 @@ Route::middleware('auth.jwt')->group(function () {
         Route::get('/{id}/grade', [\App\Http\Controllers\EvaluationController::class, 'getGrade']);
     });
 
+    // Evaluations
+    Route::prefix('evaluations')->group(function () {
+        Route::get('/criteria', [\App\Http\Controllers\EvaluationController::class, 'getCriteria']);
+    });
+
     // Weekly Reports Routes
     Route::prefix('reports')->group(function () {
         Route::get('/my', [WeeklyReportController::class, 'myReports']);
@@ -99,6 +122,8 @@ Route::middleware('auth.jwt')->group(function () {
         Route::get('/{id}', [WeeklyReportController::class, 'show']);
         Route::put('/{id}', [WeeklyReportController::class, 'save']);
         Route::post('/{id}/attachments', [WeeklyReportController::class, 'addAttachment']);
+        Route::get('/attachments/{id}/download', [WeeklyReportController::class, 'downloadAttachment']);
+        Route::delete('/attachments/{id}', [WeeklyReportController::class, 'deleteAttachment']);
         Route::post('/{id}/review', [WeeklyReportController::class, 'review']);
     });
 
@@ -121,4 +146,45 @@ Route::middleware('auth.jwt')->group(function () {
         Route::put('/{id}', [UserController::class, 'update']);
         Route::patch('/{id}/status', [UserController::class, 'updateStatus']);
     });
+
+    // Admin Settings / Configs
+    Route::prefix('admin/system-configs')->group(function () {
+        Route::get('/', [SystemConfigController::class, 'index']);
+        Route::put('/{id}', [SystemConfigController::class, 'update']);
+    });
+
+    Route::prefix('admin/grading-scales')->group(function () {
+        Route::get('/', [GradingScaleController::class, 'index']);
+        Route::post('/', [GradingScaleController::class, 'store']);
+        Route::put('/{id}', [GradingScaleController::class, 'update']);
+        Route::delete('/{id}', [GradingScaleController::class, 'destroy']);
+    });
+
+    Route::prefix('admin/evaluation-criteria')->group(function () {
+        Route::get('/', [EvaluationCriteriaController::class, 'index']);
+        Route::post('/', [EvaluationCriteriaController::class, 'store']);
+        Route::put('/{id}', [EvaluationCriteriaController::class, 'update']);
+        Route::delete('/{id}', [EvaluationCriteriaController::class, 'destroy']);
+    });
+
+    Route::prefix('admin/matching-config')->group(function () {
+        Route::get('/', [MatchingWeightConfigController::class, 'show']);
+        Route::put('/', [MatchingWeightConfigController::class, 'update']);
+    });
+
+    Route::prefix('admin/skill-categories')->group(function () {
+        Route::get('/', [SkillCategoryController::class, 'index']);
+        Route::post('/', [SkillCategoryController::class, 'store']);
+        Route::put('/{id}', [SkillCategoryController::class, 'update']);
+        Route::delete('/{id}', [SkillCategoryController::class, 'destroy']);
+    });
+
+    Route::prefix('admin/skills')->group(function () {
+        Route::post('/', [SkillController::class, 'store']);
+        Route::put('/{id}', [SkillController::class, 'update']);
+        Route::delete('/{id}', [SkillController::class, 'destroy']);
+    });
+
+    Route::post('admin/notifications', [NotificationController::class, 'store']);
+    Route::get('admin/audit-logs', [AuditLogController::class, 'index']);
 });

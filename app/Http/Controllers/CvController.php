@@ -264,4 +264,80 @@ class CvController extends Controller
 
         return response()->json(['message' => 'Document deleted successfully.'], 200);
     }
+
+    /**
+     * Download a CV document
+     */
+    public function downloadDocument(Request $request, $id)
+    {
+        $document = \App\Models\CvDocument::with('cv')->findOrFail($id);
+        $user = $request->user();
+
+        // Basic authorization: allow owner, company, or admin
+        $isOwner = $document->cv->user_id === $user->user_id;
+        $isCompany = $user->role === 'COMPANY';
+        $isAdmin = $user->role === 'ADMIN';
+
+        if (!$isOwner && !$isCompany && !$isAdmin) {
+            abort(response()->json(['message' => 'Unauthorized to download this document.'], 403));
+        }
+
+        if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($document->file_path)) {
+            abort(response()->json(['message' => 'File not found.'], 404));
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download(
+            $document->file_path, 
+            $document->file_name,
+            ['Content-Type' => $document->mime_type]
+        );
+    }
+
+    /**
+     * Get talent pool (for companies)
+     */
+    public function talentPool(Request $request)
+    {
+        $user = $request->user();
+        if ($user->role !== 'COMPANY') {
+            abort(response()->json(['message' => 'Unauthorized. Only companies can access the talent pool.'], 403));
+        }
+
+        $query = \App\Models\Cv::with(['user.studentProfile', 'skills', 'educations', 'experiences'])
+            ->where('visibility', 'PUBLIC')
+            ->where('status', 'COMPLETE');
+
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($uq) use ($search) {
+                    $uq->where('full_name', 'like', "%{$search}%");
+                })->orWhereHas('skills', function ($sq) use ($search) {
+                    $sq->where('skill_name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $cvs = $query->paginate(20);
+
+        return response()->json($cvs, 200);
+    }
+
+    /**
+     * Get a specific student's CV
+     */
+    public function getStudentCv(Request $request, $id)
+    {
+        $user = $request->user();
+        
+        if (!in_array($user->role, ['COMPANY', 'LECTURER', 'ADMIN'])) {
+            abort(response()->json(['message' => 'Unauthorized to view student CV.'], 403));
+        }
+
+        $cv = \App\Models\Cv::with(['user.studentProfile', 'educations', 'experiences', 'skills', 'documents', 'versions'])
+            ->where('user_id', $id)
+            ->firstOrFail();
+
+        return response()->json($cv, 200);
+    }
 }

@@ -35,11 +35,19 @@ import InternEvaluation from '../pages/company/InternEvaluation';
 import ManageListings from '../pages/company/ManageListings';
 import ReviewApplications from '../pages/company/ReviewApplications';
 import CompanyProfile from '../pages/company/CompanyProfile';
+import TalentPool from '../pages/company/TalentPool';
+import MyInterns from '../pages/company/MyInterns';
 
 // Admin Pages
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import UserManagement from '../pages/admin/UserManagement';
 import ListingApprovals from '../pages/admin/ListingApprovals';
+import SystemSettings from '../pages/admin/SystemSettings';
+import ManageGrading from '../pages/admin/ManageGrading';
+import RecommendationConfig from '../pages/admin/RecommendationConfig';
+import ManageSkills from '../pages/admin/ManageSkills';
+import SendNotification from '../pages/admin/SendNotification';
+import AuditLogs from '../pages/admin/AuditLogs';
 
 const HomeRedirect: React.FC = () => {
   const { user } = useAuth();
@@ -95,13 +103,21 @@ export const AppRoutes: React.FC = () => {
         <Route path="company/listings" element={<ProtectedRoute allowedRoles={['COMPANY']}><ManageListings /></ProtectedRoute>} />
         <Route path="company/listings/new" element={<ProtectedRoute allowedRoles={['COMPANY']}><CreateListing /></ProtectedRoute>} />
         <Route path="company/listings/:id/applications" element={<ProtectedRoute allowedRoles={['COMPANY']}><ReviewApplications /></ProtectedRoute>} />
+        <Route path="company/interns" element={<ProtectedRoute allowedRoles={['COMPANY']}><MyInterns /></ProtectedRoute>} />
         <Route path="company/interns/:id/evaluate" element={<ProtectedRoute allowedRoles={['COMPANY']}><InternEvaluation /></ProtectedRoute>} />
+        <Route path="company/talent-pool" element={<ProtectedRoute allowedRoles={['COMPANY']}><TalentPool /></ProtectedRoute>} />
         <Route path="company/profile" element={<ProtectedRoute allowedRoles={['COMPANY']}><CompanyProfile /></ProtectedRoute>} />
 
         {/* ADMIN Pathways */}
         <Route path="admin/dashboard" element={<ProtectedRoute allowedRoles={['ADMIN']}><AdminDashboard /></ProtectedRoute>} />
         <Route path="admin/users" element={<ProtectedRoute allowedRoles={['ADMIN']}><UserManagement /></ProtectedRoute>} />
         <Route path="admin/approvals" element={<ProtectedRoute allowedRoles={['ADMIN']}><ListingApprovals /></ProtectedRoute>} />
+        <Route path="admin/system-settings" element={<ProtectedRoute allowedRoles={['ADMIN']}><SystemSettings /></ProtectedRoute>} />
+        <Route path="admin/grading" element={<ProtectedRoute allowedRoles={['ADMIN']}><ManageGrading /></ProtectedRoute>} />
+        <Route path="admin/recommendation-config" element={<ProtectedRoute allowedRoles={['ADMIN']}><RecommendationConfig /></ProtectedRoute>} />
+        <Route path="admin/skills" element={<ProtectedRoute allowedRoles={['ADMIN']}><ManageSkills /></ProtectedRoute>} />
+        <Route path="admin/send-notification" element={<ProtectedRoute allowedRoles={['ADMIN']}><SendNotification /></ProtectedRoute>} />
+        <Route path="admin/audit-logs" element={<ProtectedRoute allowedRoles={['ADMIN']}><AuditLogs /></ProtectedRoute>} />
 
       </Route>
 

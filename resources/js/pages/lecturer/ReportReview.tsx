@@ -44,6 +44,25 @@ export const ReportReview: React.FC = () => {
     }
   };
 
+  const handleDownloadAttachment = async (attachment: any) => {
+    try {
+      const response = await api.get(`/reports/attachments/${attachment.attachment_id || attachment.id}/download`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', attachment.file_name);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Error downloading attachment', error);
+      alert('Failed to download attachment.');
+    }
+  };
+
   if (isLoading) {
     return <div className="text-center py-12 text-slate-400">Loading report details...</div>;
   }
@@ -111,6 +130,29 @@ export const ReportReview: React.FC = () => {
                   {report.learnings || 'No learnings logged.'}
                 </div>
               </div>
+
+              {report.attachments && report.attachments.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-slate-400 mb-2">Attachments</h4>
+                  <ul className="space-y-2">
+                    {report.attachments.map((att: any) => (
+                      <li key={att.attachment_id || att.id} className="flex items-center justify-between bg-slate-900/50 p-3 rounded-lg border border-slate-800">
+                        <span className="text-sm text-slate-300 truncate max-w-[70%]">{att.file_name}</span>
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          onClick={() => handleDownloadAttachment(att)}
+                        >
+                          <svg className="w-4 h-4 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                          </svg>
+                          Download
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </Card>
         </div>
