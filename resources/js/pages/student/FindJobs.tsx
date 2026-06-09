@@ -96,6 +96,16 @@ export const FindJobs: React.FC = () => {
     }).catch(() => {});
   }, []);
 
+  // Update selectedJob if data changes (e.g., after refreshing match scores)
+  useEffect(() => {
+    if (selectedJob && data?.listings) {
+      const updatedJob = data.listings.find((j: any) => j.listing_id === selectedJob.listing_id);
+      if (updatedJob && updatedJob.match_score !== selectedJob.match_score) {
+        setSelectedJob(updatedJob);
+      }
+    }
+  }, [data]);
+
   // ── Toast helpers ───────────────────────────────────────────────────────────
   const addToast = (message: string, type: Toast['type']) => {
     const id = Date.now();

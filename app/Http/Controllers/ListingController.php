@@ -27,7 +27,7 @@ class ListingController extends Controller
             'application_deadline' => 'required|date',
             'skills' => 'sometimes|array',
             'skills.*.skill_id' => 'required|integer',
-            'skills.*.importance' => 'required|in:MANDATORY,HIGH,MEDIUM,LOW',
+            'skills.*.importance' => 'required|in:REQUIRED,PREFERRED',
             'skills.*.importance_weight' => 'sometimes|numeric'
         ]);
 

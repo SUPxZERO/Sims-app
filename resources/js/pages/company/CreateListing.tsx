@@ -26,7 +26,7 @@ export const CreateListing: React.FC = () => {
   const { data: categoriesData } = useFetch<any[]>('/skills', true);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [newSkillId, setNewSkillId] = useState('');
-  const [importance, setImportance] = useState('MANDATORY');
+  const [importance, setImportance] = useState('REQUIRED');
 
   const handleAddSkill = () => {
     if (newSkillId && !skills.find(s => s.skill_id.toString() === newSkillId)) {
@@ -53,7 +53,11 @@ export const CreateListing: React.FC = () => {
     try {
       await api.post('/listings', {
         ...formData,
-        skills: skills.map(s => ({ skill_id: s.skill_id, importance: s.importance })),
+        skills: skills.map(s => ({ 
+          skill_id: s.skill_id, 
+          importance: s.importance,
+          importance_weight: s.importance === 'REQUIRED' ? 1.0 : 0.5
+        })),
         duration_weeks: parseInt(formData.duration_weeks as unknown as string, 10),
         quota: parseInt(formData.quota as unknown as string, 10),
         min_gpa: formData.min_gpa ? parseFloat(formData.min_gpa) : null
@@ -164,10 +168,8 @@ export const CreateListing: React.FC = () => {
                     value={importance}
                     onChange={(e) => setImportance(e.target.value)}
                   >
-                    <option value="MANDATORY">Mandatory</option>
-                    <option value="HIGH">High</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="LOW">Low</option>
+                    <option value="REQUIRED">Required</option>
+                    <option value="PREFERRED">Preferred</option>
                   </select>
                 </div>
                 <Button type="button" onClick={handleAddSkill} disabled={!newSkillId}>Add</Button>

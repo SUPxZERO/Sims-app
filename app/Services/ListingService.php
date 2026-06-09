@@ -67,6 +67,15 @@ class ListingService
 
         $listing->save();
 
+        // Automatically calculate match scores for all students when the listing is published
+        if ($status === 'PUBLISHED') {
+            try {
+                app(\App\Services\RecommendationService::class)->recalculateListingRecommendations($listing->listing_id);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Failed to recalculate listing recommendations after publish: ' . $e->getMessage());
+            }
+        }
+
         return $listing;
     }
 
