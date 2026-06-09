@@ -71,6 +71,7 @@ class ProfileController extends Controller
                         'bio' => 'nullable|string',
                         'department' => 'sometimes|required|string|max:100',
                         'expected_graduation' => 'nullable|integer',
+                        'gpa' => 'nullable|numeric|between:0,4.00',
                     ]);
 
                     $profile->update($request->only([
@@ -79,7 +80,8 @@ class ProfileController extends Controller
                         'linkedin_url',
                         'bio',
                         'department',
-                        'expected_graduation'
+                        'expected_graduation',
+                        'gpa'
                     ]));
                 }
             } elseif ($user->role === 'COMPANY') {

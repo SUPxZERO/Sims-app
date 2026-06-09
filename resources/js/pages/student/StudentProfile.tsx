@@ -14,6 +14,7 @@ export const StudentProfile: React.FC = () => {
     full_name: '',
     department: '',
     expected_graduation: '',
+    gpa: '',
     phone_number: '',
     address: '',
     linkedin_url: '',
@@ -29,6 +30,7 @@ export const StudentProfile: React.FC = () => {
         full_name: user.full_name || '',
         department: profile.department || '',
         expected_graduation: profile.expected_graduation?.toString() || '',
+        gpa: profile.gpa?.toString() || '',
         phone_number: profile.phone_number || '',
         address: profile.address || '',
         linkedin_url: profile.linkedin_url || '',
@@ -49,7 +51,8 @@ export const StudentProfile: React.FC = () => {
     try {
       await api.put('/profile', {
         ...formData,
-        expected_graduation: formData.expected_graduation ? parseInt(formData.expected_graduation) : null
+        expected_graduation: formData.expected_graduation ? parseInt(formData.expected_graduation) : null,
+        gpa: formData.gpa ? parseFloat(formData.gpa) : null
       });
       alert('Profile updated successfully!');
       refetch();
@@ -103,6 +106,18 @@ export const StudentProfile: React.FC = () => {
               type="number"
               placeholder="e.g. 2026"
               value={formData.expected_graduation} 
+              onChange={handleChange} 
+            />
+
+            <Input 
+              label="Current GPA" 
+              name="gpa" 
+              type="number"
+              step="0.01"
+              min="0"
+              max="4"
+              placeholder="e.g. 3.50"
+              value={formData.gpa} 
               onChange={handleChange} 
             />
 

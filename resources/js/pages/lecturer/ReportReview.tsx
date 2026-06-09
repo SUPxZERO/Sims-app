@@ -29,9 +29,17 @@ export const ReportReview: React.FC = () => {
     }
   }, [id]);
 
-  const handleAction = async (action: 'approve' | 'revise') => {
+  const handleAction = async (action: 'approve' | 'revise' | 'reject') => {
+    if ((action === 'revise' || action === 'reject') && feedback.trim().length < 20) {
+      alert('Feedback must be at least 20 characters when requesting a revision or rejecting.');
+      return;
+    }
+
     try {
-      const decision = action === 'approve' ? 'APPROVED' : 'REVISION_REQUESTED';
+      let decision = 'APPROVED';
+      if (action === 'revise') decision = 'REVISION_REQUESTED';
+      if (action === 'reject') decision = 'REJECTED';
+
       await api.post(`/reports/${id}/review`, {
         decision,
         comments: feedback || 'No comments provided.'
@@ -179,7 +187,7 @@ export const ReportReview: React.FC = () => {
                     onChange={(e) => setFeedback(e.target.value)}
                   ></textarea>
                   <p className="text-xs text-slate-500 mt-2">
-                    Required if requesting a revision. (Current revisions: {report.revision_count || 0}/3)
+                    Minimum 20 characters required if requesting a revision or rejecting. (Current revisions: {report.revision_count || 0}/2)
                   </p>
                 </div>
 
@@ -194,10 +202,18 @@ export const ReportReview: React.FC = () => {
                   <Button 
                     variant="secondary" 
                     className="w-full"
-                    disabled={!feedback.trim() || (report.revision_count || 0) >= 3}
+                    disabled={feedback.trim().length < 20 || (report.revision_count || 0) >= 2}
                     onClick={() => handleAction('revise')}
                   >
                     Request Revision
+                  </Button>
+                  <Button 
+                    variant="danger" 
+                    className="w-full"
+                    disabled={feedback.trim().length < 20}
+                    onClick={() => handleAction('reject')}
+                  >
+                    Reject Report
                   </Button>
                 </div>
               </div>
