@@ -73,7 +73,7 @@ class NotificationController extends Controller
             'title' => 'required|string|max:150',
             'message' => 'required|string|max:1000',
             'type' => 'required|string|in:SYSTEM,ALERT,INFO',
-            'priority' => 'required|string|in:LOW,NORMAL,HIGH,URGENT',
+            'priority' => 'required|string|in:LOW,MEDIUM,HIGH',
         ]);
 
         try {
@@ -81,6 +81,9 @@ class NotificationController extends Controller
             
             if ($request->user_id === 'all') {
                 $userIds = User::where('status', 'ACTIVE')->pluck('user_id')->toArray();
+            } else if (is_string($request->user_id) && str_starts_with($request->user_id, 'role:')) {
+                $role = substr($request->user_id, 5);
+                $userIds = User::where('status', 'ACTIVE')->where('role', $role)->pluck('user_id')->toArray();
             } else if (is_array($request->user_id)) {
                 $userIds = $request->user_id;
             } else {
@@ -104,7 +107,7 @@ class NotificationController extends Controller
 
             return response()->json(['message' => 'Notifications sent successfully', 'count' => $count], 201);
         } catch (Exception $e) {
-            return response()->json(['error' => 'Failed to send notifications'], 500);
+            return response()->json(['error' => 'Failed to send notifications: ' . $e->getMessage()], 500);
         }
     }
 }

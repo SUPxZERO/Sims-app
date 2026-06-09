@@ -94,7 +94,7 @@ export const ManageSkills: React.FC = () => {
               <input placeholder="Description" className="input-field w-full text-sm p-2 bg-slate-800 rounded text-slate-200" 
                 value={newCat.description} onChange={e => setNewCat({...newCat, description: e.target.value})} />
               <input required type="number" placeholder="Sort Order" className="input-field w-full text-sm p-2 bg-slate-800 rounded text-slate-200" 
-                value={newCat.sort_order} onChange={e => setNewCat({...newCat, sort_order: parseInt(e.target.value)})} />
+                value={newCat.sort_order === 0 ?"" : newCat.sort_order ?? ""} onChange={e => setNewCat({...newCat, sort_order: parseInt(e.target.value)})} />
               <Button type="submit" variant="primary" className="w-full">Add Category</Button>
             </form>
           </Card>

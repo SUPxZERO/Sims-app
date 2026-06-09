@@ -9,7 +9,7 @@ export const SendNotification: React.FC = () => {
     title: '',
     message: '',
     type: 'INFO',
-    priority: 'NORMAL'
+    priority: 'MEDIUM'
   });
   const [isSending, setIsSending] = useState(false);
 
@@ -46,9 +46,12 @@ export const SendNotification: React.FC = () => {
               onChange={e => setFormData({ ...formData, user_id: e.target.value })}
             >
               <option value="all">All Active Users (Broadcast)</option>
-              {/* Future: Add 'roles' or specific user fetching here if needed */}
-              <option disabled value="">--- Specific Roles (Coming soon) ---</option>
-              <option disabled value="">--- Specific Users (Coming soon) ---</option>
+              <optgroup label="By Role">
+                <option value="role:STUDENT">All Students</option>
+                <option value="role:COMPANY">All Companies</option>
+                <option value="role:LECTURER">All Lecturers</option>
+                <option value="role:ADMIN">All System Admins</option>
+              </optgroup>
             </select>
             <p className="text-xs text-slate-500 mt-1">Select who should receive this notification.</p>
           </div>
@@ -74,9 +77,8 @@ export const SendNotification: React.FC = () => {
                 onChange={e => setFormData({ ...formData, priority: e.target.value })}
               >
                 <option value="LOW">Low</option>
-                <option value="NORMAL">Normal</option>
+                <option value="MEDIUM">Medium</option>
                 <option value="HIGH">High</option>
-                <option value="URGENT">Urgent</option>
               </select>
             </div>
           </div>
