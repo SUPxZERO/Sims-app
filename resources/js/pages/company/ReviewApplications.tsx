@@ -8,6 +8,7 @@ import Spinner from '../../components/common/Spinner';
 import CvViewer from '../../components/cv/CvViewer';
 import Modal from '../../components/common/Modal';
 import ApplicationTimeline from '../../components/common/ApplicationTimeline';
+import ScheduleInterviewModal from './ScheduleInterviewModal';
 
 export const ReviewApplications: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,7 @@ export const ReviewApplications: React.FC = () => {
   const [updating, setUpdating] = useState<number | null>(null);
   const [expandedApp, setExpandedApp] = useState<number | null>(null);
   const [timelineAppId, setTimelineAppId] = useState<number | null>(null);
+  const [interviewAppId, setInterviewAppId] = useState<number | null>(null);
 
   if (loading) {
     return (
@@ -144,6 +146,14 @@ export const ReviewApplications: React.FC = () => {
                 </button>
                 
                 <button 
+                  onClick={() => setInterviewAppId(app.application_id)}
+                  disabled={app.status === 'REJECTED'}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Schedule Interview
+                </button>
+                
+                <button 
                   onClick={() => handleStatusChange(app.application_id, 'REJECTED')}
                   disabled={updating === app.application_id || app.status === 'REJECTED' || app.status === 'ACCEPTED'}
                   className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-medium rounded-lg transition-colors border border-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -172,6 +182,16 @@ export const ReviewApplications: React.FC = () => {
       >
         {timelineAppId && <ApplicationTimeline applicationId={timelineAppId} />}
       </Modal>
+
+      <ScheduleInterviewModal
+        isOpen={interviewAppId !== null}
+        onClose={() => setInterviewAppId(null)}
+        applicationId={interviewAppId}
+        onScheduled={() => {
+          alert('Interview scheduled successfully!');
+          refetch();
+        }}
+      />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import JobPreferencesForm from './JobPreferencesForm';
 
 export const StudentProfile: React.FC = () => {
   const { data: profileData, loading, refetch } = useFetch<any>('/profile', true);
@@ -160,6 +161,8 @@ export const StudentProfile: React.FC = () => {
           </div>
         </form>
       </Card>
+
+      <JobPreferencesForm />
     </div>
   );
 };

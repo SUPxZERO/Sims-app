@@ -19,7 +19,9 @@ use App\Http\Controllers\MatchingWeightConfigController;
 use App\Http\Controllers\SkillCategoryController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AuditLogController;
-
+use App\Http\Controllers\StudentPreferenceController;
+use App\Http\Controllers\SavedListingController;
+use App\Http\Controllers\InterviewController;
 // Auth Routes
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
@@ -138,6 +140,23 @@ Route::middleware('auth.jwt')->group(function () {
 
     // Skills
     Route::get('/skills', [SkillController::class, 'index']);
+
+    // Student Preferences & Saved Listings
+    Route::prefix('student/preferences')->group(function () {
+        Route::get('/', [StudentPreferenceController::class, 'show']);
+        Route::put('/', [StudentPreferenceController::class, 'update']);
+    });
+    
+    Route::prefix('student/saved-listings')->group(function () {
+        Route::get('/', [SavedListingController::class, 'index']);
+    });
+    Route::post('/listings/{id}/save', [SavedListingController::class, 'store']);
+    Route::delete('/listings/{id}/unsave', [SavedListingController::class, 'destroy']);
+
+    // Interviews
+    Route::get('/student/interviews', [InterviewController::class, 'studentInterviews']);
+    Route::post('/applications/{applicationId}/interviews', [InterviewController::class, 'store']);
+    Route::put('/interviews/{id}', [InterviewController::class, 'update']);
 
     // User Management
     Route::prefix('users')->group(function () {

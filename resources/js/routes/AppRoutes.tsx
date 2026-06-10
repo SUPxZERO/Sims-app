@@ -19,6 +19,7 @@ import WeeklyReports from '../pages/student/WeeklyReports';
 import FindJobs from '../pages/student/FindJobs';
 import MyApplications from '../pages/student/MyApplications';
 import StudentProfile from '../pages/student/StudentProfile';
+import SavedListings from '../pages/student/SavedListings';
 
 // Lecturer Pages
 import LecturerDashboard from '../pages/lecturer/LecturerDashboard';
@@ -87,6 +88,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="student/cv" element={<ProtectedRoute allowedRoles={['STUDENT']}><CVBuilder /></ProtectedRoute>} />
         <Route path="student/weekly-reports" element={<ProtectedRoute allowedRoles={['STUDENT']}><WeeklyReports /></ProtectedRoute>} />
         <Route path="student/find-jobs" element={<ProtectedRoute allowedRoles={['STUDENT']}><FindJobs /></ProtectedRoute>} />
+        <Route path="student/saved-jobs" element={<ProtectedRoute allowedRoles={['STUDENT']}><SavedListings /></ProtectedRoute>} />
         <Route path="student/applications" element={<ProtectedRoute allowedRoles={['STUDENT']}><MyApplications /></ProtectedRoute>} />
         <Route path="student/profile" element={<ProtectedRoute allowedRoles={['STUDENT']}><StudentProfile /></ProtectedRoute>} />
 

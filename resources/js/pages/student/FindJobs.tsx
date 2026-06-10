@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { JobDetailsModal, MatchRing } from '../../components/student/JobDetailsModal';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
@@ -40,41 +41,6 @@ const ToastContainer: React.FC<{ toasts: Toast[]; onRemove: (id: number) => void
   );
 };
 
-// ── Match ring SVG ────────────────────────────────────────────────────────────
-const MatchRing: React.FC<{ score: number | null }> = ({ score }) => {
-  const color = score === null ? '' : score >= 80 ? 'text-emerald-400' : score >= 60 ? 'text-yellow-400' : 'text-red-400';
-  return (
-    <div className="relative w-12 h-12 flex items-center justify-center">
-      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-        <path className="text-slate-700" strokeWidth="3" stroke="currentColor" fill="none"
-          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-        {score !== null && (
-          <path className={color} strokeWidth="3" strokeDasharray={`${score}, 100`}
-            stroke="currentColor" fill="none" strokeLinecap="round"
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-        )}
-      </svg>
-      <span className={`absolute text-[10px] font-bold ${score !== null ? color : 'text-slate-500'}`}>
-        {score !== null ? `${score}%` : 'N/A'}
-      </span>
-    </div>
-  );
-};
-
-// ── Sub-score mini bar ────────────────────────────────────────────────────────
-const ScoreBar: React.FC<{ label: string; value: number; weight: string; color: string }> = ({ label, value, weight, color }) => (
-  <div className={`p-4 rounded-xl border ${color}`}>
-    <div className="flex justify-between items-center mb-2">
-      <div className="text-xs font-semibold opacity-80">{label}</div>
-      <div className="text-xs opacity-60">{weight}</div>
-    </div>
-    <div className="text-2xl font-bold">{Math.round(value)}%</div>
-    <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
-      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${value}%`, background: 'currentColor', opacity: 0.6 }} />
-    </div>
-  </div>
-);
-
 // ── Main Component ────────────────────────────────────────────────────────────
 export const FindJobs: React.FC = () => {
   const [searchTerm, setSearchTerm]   = useState('');
@@ -82,6 +48,7 @@ export const FindJobs: React.FC = () => {
   const [applying, setApplying]       = useState<number | null>(null);
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [appliedIds, setAppliedIds]   = useState<Set<number>>(new Set());
+  const [savedIds, setSavedIds]       = useState<Set<number>>(new Set());
   const [toasts, setToasts]           = useState<Toast[]>([]);
   const [refreshing, setRefreshing]   = useState(false);
 
@@ -93,6 +60,11 @@ export const FindJobs: React.FC = () => {
     api.get('/applications/student').then(res => {
       const ids = (res.data.applications || []).map((a: any) => a.listing_id);
       setAppliedIds(new Set(ids));
+    }).catch(() => {});
+
+    api.get('/student/saved-listings').then(res => {
+      const ids = (res.data.saved_listings || []).map((s: any) => s.listing_id);
+      setSavedIds(new Set(ids));
     }).catch(() => {});
   }, []);
 
@@ -126,6 +98,27 @@ export const FindJobs: React.FC = () => {
       addToast(err.response?.data?.error || 'Failed to apply. Please try again.', 'error');
     } finally {
       setApplying(null);
+    }
+  };
+
+  const handleToggleSave = async (e: React.MouseEvent, listingId: number) => {
+    e.stopPropagation();
+    try {
+      if (savedIds.has(listingId)) {
+        await api.delete(`/listings/${listingId}/unsave`);
+        setSavedIds(prev => {
+          const next = new Set(prev);
+          next.delete(listingId);
+          return next;
+        });
+        addToast('Removed from saved jobs', 'info');
+      } else {
+        await api.post(`/listings/${listingId}/save`);
+        setSavedIds(prev => new Set([...prev, listingId]));
+        addToast('Job saved for later!', 'success');
+      }
+    } catch {
+      addToast('Failed to update save status', 'error');
     }
   };
 
@@ -219,12 +212,21 @@ export const FindJobs: React.FC = () => {
             >
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1 pr-3">
-                  <h3 className="text-base font-bold text-slate-100 group-hover:text-blue-300 transition-colors">
-                    {job.title}
-                  </h3>
-                  <p className="text-slate-400 text-sm">{job.company_profile?.company_name || 'Company'}</p>
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-base font-bold text-slate-100 group-hover:text-blue-300 transition-colors">
+                      {job.title}
+                    </h3>
+                    <button
+                      onClick={(e) => handleToggleSave(e, job.listing_id)}
+                      className="text-xl leading-none opacity-60 hover:opacity-100 transition-opacity"
+                      title={savedIds.has(job.listing_id) ? "Unsave" : "Save for later"}
+                    >
+                      {savedIds.has(job.listing_id) ? '🔖' : '🤍'}
+                    </button>
+                  </div>
+                  <p className="text-slate-400 text-sm mt-1">{job.company_profile?.company_name || 'Company'}</p>
                 </div>
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center gap-1 ml-2">
                   <span className="text-[10px] text-slate-500">Match</span>
                   <MatchRing score={match} />
                 </div>
@@ -260,146 +262,14 @@ export const FindJobs: React.FC = () => {
       </div>
 
       {/* ── Detail Modal ── */}
-      {selectedJob && createPortal(
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-          onClick={() => setSelectedJob(null)}
-        >
-          <div
-            className="bg-[#0f1623] border border-slate-700/60 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Modal header */}
-            <div className="flex justify-between items-start p-6 border-b border-slate-800">
-              <div>
-                <h2 className="text-xl font-bold text-slate-100">{selectedJob.title}</h2>
-                <p className="text-slate-400 text-sm">{selectedJob.company_profile?.company_name}</p>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <Badge variant="primary">{selectedJob.work_mode}</Badge>
-                  <Badge variant="info">{selectedJob.location}</Badge>
-                </div>
-              </div>
-              <div className="flex flex-col items-center gap-1 ml-4">
-                <span className="text-[10px] text-slate-500">Match</span>
-                <MatchRing score={selectedJob.match_score != null ? Math.round(selectedJob.match_score) : null} />
-              </div>
-              <button
-                onClick={() => setSelectedJob(null)}
-                className="ml-4 text-slate-500 hover:text-slate-200 text-2xl leading-none transition-colors self-start"
-              >×</button>
-            </div>
-
-            {/* Modal body */}
-            <div className="p-6 overflow-y-auto space-y-8 flex-1">
-
-              {/* Score breakdown */}
-              <div>
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                  Match Breakdown
-                </h3>
-                {selectedJob.match_details ? (
-                  <div className="grid grid-cols-3 gap-3">
-                    <ScoreBar label="Skills" weight="60% weight"
-                      value={selectedJob.match_details.skill_match_score}
-                      color="border-blue-500/20 bg-blue-500/5 text-blue-400" />
-                    <ScoreBar label="GPA" weight="20% weight"
-                      value={selectedJob.match_details.gpa_match_score}
-                      color="border-emerald-500/20 bg-emerald-500/5 text-emerald-400" />
-                    <ScoreBar label="Preferences" weight="20% weight"
-                      value={selectedJob.match_details.preference_match_score}
-                      color="border-purple-500/20 bg-purple-500/5 text-purple-400" />
-                  </div>
-                ) : (
-                  <div className="text-slate-500 text-sm p-4 bg-slate-800/50 rounded-lg">
-                    Scores not calculated yet — click <strong>Refresh Match Scores</strong> on the main page.
-                  </div>
-                )}
-              </div>
-
-              {/* Skill analysis */}
-              {selectedJob.listing_required_skills?.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                    Required Skills
-                    <span className="ml-2 text-slate-500 normal-case font-normal text-xs">
-                      ({selectedJob.match_details?.matched_skills_count ?? '?'} / {selectedJob.listing_required_skills.length} matched)
-                    </span>
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {selectedJob.listing_required_skills.map((reqSkill: any) => {
-                      const hasSkill = cvData?.skills?.some((cvs: any) => cvs.skill_id === reqSkill.skill_id);
-                      const studentSkill = cvData?.skills?.find((cvs: any) => cvs.skill_id === reqSkill.skill_id);
-                      return (
-                        <div
-                          key={reqSkill.listing_skill_id}
-                          className={`flex items-center gap-3 p-3 rounded-lg border ${
-                            hasSkill
-                              ? 'border-emerald-500/25 bg-emerald-500/10'
-                              : 'border-slate-700/40 bg-slate-800/30'
-                          }`}
-                        >
-                          <span className="text-lg shrink-0">{hasSkill ? '✅' : '❌'}</span>
-                          <div className="min-w-0">
-                            <div className={`font-semibold text-sm truncate ${hasSkill ? 'text-emerald-300' : 'text-slate-400'}`}>
-                              {reqSkill.skill?.skill_name}
-                            </div>
-                            <div className="text-[11px] text-slate-500 flex gap-2">
-                              <span>{reqSkill.importance}</span>
-                              {hasSkill && studentSkill?.pivot?.proficiency_level && (
-                                <span className="text-emerald-600">· {studentSkill.pivot.proficiency_level}</span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Internship details */}
-              <div>
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                  Details
-                </h3>
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                  <div className="p-3 bg-slate-800/50 rounded-lg">
-                    <span className="text-[11px] text-slate-500 block mb-1">Duration</span>
-                    <span className="text-sm font-semibold text-slate-200">{selectedJob.duration_weeks} Weeks</span>
-                  </div>
-                  <div className="p-3 bg-slate-800/50 rounded-lg">
-                    <span className="text-[11px] text-slate-500 block mb-1">Quota</span>
-                    <span className="text-sm font-semibold text-slate-200">{selectedJob.quota} slots</span>
-                  </div>
-                  <div className="p-3 bg-slate-800/50 rounded-lg">
-                    <span className="text-[11px] text-slate-500 block mb-1">Min. GPA</span>
-                    <span className="text-sm font-semibold text-slate-200">{selectedJob.min_gpa ?? 'No requirement'}</span>
-                  </div>
-                  <div className="p-3 bg-slate-800/50 rounded-lg">
-                    <span className="text-[11px] text-slate-500 block mb-1">Deadline</span>
-                    <span className="text-sm font-semibold text-slate-200">{new Date(selectedJob.application_deadline).toLocaleDateString()}</span>
-                  </div>
-                </div>
-                <p className="whitespace-pre-wrap text-slate-300 leading-relaxed text-sm">
-                  {selectedJob.description}
-                </p>
-              </div>
-            </div>
-
-            {/* Modal footer */}
-            <div className="p-5 border-t border-slate-800 bg-slate-900/60 flex justify-end gap-3">
-              <Button variant="secondary" onClick={() => setSelectedJob(null)}>Close</Button>
-              <Button
-                onClick={() => handleApply(selectedJob.listing_id)}
-                disabled={applying === selectedJob.listing_id}
-              >
-                {applying === selectedJob.listing_id ? 'Submitting…' : 'Apply Now'}
-              </Button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      <JobDetailsModal
+        job={selectedJob}
+        cvData={cvData}
+        applying={applying}
+        onClose={() => setSelectedJob(null)}
+        onApply={handleApply}
+        showMatchScore={true}
+      />
     </div>
   );
 };

@@ -29,6 +29,7 @@ ChartJS.register(
 export const StudentDashboard: React.FC = () => {
   const { user } = useAuth();
   const { data, loading, error } = useFetch<any>('/dashboard', true);
+  const { data: interviewData } = useFetch<any>('/student/interviews', true);
 
   if (loading) {
     return (
@@ -53,6 +54,7 @@ export const StudentDashboard: React.FC = () => {
   const weeklyReportStats = data?.weekly_report_stats || {};
   const reportLabels = Object.keys(weeklyReportStats);
   const reportData = Object.values(weeklyReportStats);
+  const interviews = interviewData?.interviews || [];
 
   const doughnutOptions = {
     responsive: true,
@@ -173,6 +175,47 @@ export const StudentDashboard: React.FC = () => {
             </div>
           </Card>
         </div>
+      )}
+
+      {/* Upcoming Interviews */}
+      {interviews.length > 0 && (
+        <Card>
+          <div className="mb-6">
+            <h2 className="text-lg font-outfit font-semibold text-slate-100">Upcoming Interviews</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {interviews.map((interview: any) => (
+              <div key={interview.id} className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-bold text-slate-200">{interview.application?.listing?.title}</h3>
+                  <Badge variant={interview.status === 'SCHEDULED' ? 'primary' : 'success'}>
+                    {interview.status}
+                  </Badge>
+                </div>
+                <p className="text-sm text-slate-400 mb-3">{interview.application?.listing?.company?.full_name}</p>
+                
+                <div className="flex flex-col gap-2 text-sm text-slate-300">
+                  <div className="flex items-center gap-2">
+                    <span>📅</span>
+                    <span>{new Date(interview.scheduled_at).toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>⏱️</span>
+                    <span>{interview.duration_minutes} mins</span>
+                  </div>
+                  {interview.meeting_link && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <span>🔗</span>
+                      <a href={interview.meeting_link} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-blue-300 underline">
+                        Join Meeting
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
 
       {/* Recommendations & Applications Grid */}
