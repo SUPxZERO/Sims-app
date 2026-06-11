@@ -6,6 +6,8 @@ import Spinner from '../../components/common/Spinner';
 import CvViewer from '../../components/cv/CvViewer';
 import Modal from '../../components/common/Modal';
 import api from '../../services/api';
+import PageHeader from '../../components/common/PageHeader';
+import talentPoolVideo from '../../assets/talent_pool_video.mp4';
 
 export const TalentPool: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -65,12 +67,13 @@ export const TalentPool: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Talent Pool</h1>
-          <p className="text-slate-400">Discover and recruit top talent with complete professional profiles.</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Talent Pool" 
+        subtitle="Discover and recruit top talent with complete professional profiles."
+        mediaType="video"
+        mediaSrc={talentPoolVideo}
+        heightClass="min-h-[250px]"
+      />
 
       <Card>
         <div className="mb-6">

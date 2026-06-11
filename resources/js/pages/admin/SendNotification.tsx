@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
+import PageHeader from '../../components/common/PageHeader';
+import sendNotificationBg from '../../assets/send_notification_bg.jpg';
 
 export const SendNotification: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -31,10 +33,12 @@ export const SendNotification: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-100">Send Notification</h1>
-        <p className="text-slate-400 text-sm mt-1">Broadcast system alerts or updates to users</p>
-      </div>
+      <PageHeader 
+        title="Send Notification" 
+        subtitle="Broadcast system alerts or updates to users"
+        mediaType="image"
+        mediaSrc={sendNotificationBg}
+      />
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-5">

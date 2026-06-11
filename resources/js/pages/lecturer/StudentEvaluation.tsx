@@ -7,6 +7,8 @@ import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
+import PageHeader from '../../components/common/PageHeader';
+import studentEvalBg from '../../assets/student_eval_bg.jpg';
 
 export const StudentEvaluation: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -81,19 +83,23 @@ export const StudentEvaluation: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
+      <PageHeader 
+        title="Student Evaluation" 
+        subtitle={`Submit final grades for ${internship?.student_profile?.user?.full_name || internship?.student?.full_name || 'Unknown'}.`}
+        mediaType="image"
+        mediaSrc={studentEvalBg}
+        heightClass="min-h-[250px]"
+      >
+        <div className="flex gap-4 items-center flex-col md:flex-row">
           <button 
             onClick={() => navigate('/lecturer/students')}
-            className="text-slate-400 hover:text-slate-300 text-sm flex items-center mb-2 transition-colors"
+            className="text-slate-400 hover:text-slate-300 text-sm flex items-center transition-colors"
           >
             &larr; Back to Student Roster
           </button>
-          <h1 className="text-2xl font-bold text-slate-100">Student Evaluation</h1>
-          <p className="text-slate-400">Submit final grades for {internship?.student_profile?.user?.full_name || internship?.student?.full_name || 'Unknown'}.</p>
+          {isSubmitted && <Badge variant="success">Evaluation Submitted</Badge>}
         </div>
-        {isSubmitted && <Badge variant="success">Evaluation Submitted</Badge>}
-      </div>
+      </PageHeader>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Evaluation Form */}

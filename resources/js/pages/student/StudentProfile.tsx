@@ -5,6 +5,7 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import JobPreferencesForm from './JobPreferencesForm';
+import studentCoverReal from '../../assets/student_cover_real.jpg';
 
 export const StudentProfile: React.FC = () => {
   const { data: profileData, loading, refetch } = useFetch<any>('/profile', true);
@@ -73,6 +74,21 @@ export const StudentProfile: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold text-slate-100">My Profile</h1>
         <p className="text-slate-400">Manage your personal and academic information.</p>
+      </div>
+
+      {/* Cover Banner */}
+      <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden mb-6 border border-slate-800 shadow-lg min-h-[300px]">
+        <img src={studentCoverReal} alt="Profile Cover" className="w-full h-full object-cover object-center" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent opacity-90"></div>
+        <div className="absolute bottom-4 left-6 flex items-center gap-4">
+          <div className="w-20 h-20 bg-slate-800 rounded-full border-4 border-slate-950 flex items-center justify-center text-3xl font-bold text-blue-400 shadow-xl">
+            {formData.full_name ? formData.full_name.charAt(0) : 'S'}
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white shadow-sm">{formData.full_name || 'Student Name'}</h2>
+            <p className="text-blue-300 font-medium">{formData.department || 'Department'}</p>
+          </div>
+        </div>
       </div>
 
       <Card>

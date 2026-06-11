@@ -4,6 +4,8 @@ import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import PageHeader from '../../components/common/PageHeader';
+import weeklyReportsVideo from '../../assets/weekly_reports_video.mp4';
 export const WeeklyReports: React.FC = () => {
   const [reports, setReports] = useState<any[]>([]);
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
@@ -139,13 +141,15 @@ export const WeeklyReports: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Weekly Reports</h1>
-          <p className="text-slate-400">Log your internship activities and track attendance</p>
-        </div>
+      <PageHeader 
+        title="Weekly Reports" 
+        subtitle="Log your internship activities and track attendance"
+        mediaType="video"
+        mediaSrc={weeklyReportsVideo}
+        heightClass="min-h-[250px]"
+      >
         <Button onClick={fetchReports}>Refresh</Button>
-      </div>
+      </PageHeader>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">

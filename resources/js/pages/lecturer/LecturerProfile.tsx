@@ -4,6 +4,7 @@ import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import lecturerCoverVideo from '../../assets/lecturer_cover_video.mp4';
 
 export const LecturerProfile: React.FC = () => {
   const { data: profileData, loading, refetch } = useFetch<any>('/profile', true);
@@ -67,6 +68,23 @@ export const LecturerProfile: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold text-slate-100">Lecturer Profile</h1>
         <p className="text-slate-400">Manage your academic profile and supervision capacity.</p>
+      </div>
+
+      {/* Cover Banner */}
+      <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden mb-6 border border-slate-800 shadow-lg min-h-[300px]">
+        <video autoPlay loop muted playsInline className="w-full h-full object-cover object-center opacity-80">
+          <source src={lecturerCoverVideo} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent opacity-90"></div>
+        <div className="absolute bottom-4 left-6 flex items-center gap-4">
+          <div className="w-20 h-20 bg-slate-800 rounded-lg border-4 border-slate-950 flex items-center justify-center text-3xl font-bold text-blue-400 shadow-xl">
+            {formData.full_name ? formData.full_name.charAt(0) : 'L'}
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white shadow-sm">{formData.full_name || 'Lecturer Name'}</h2>
+            <p className="text-blue-300 font-medium">{formData.department || 'Department'}</p>
+          </div>
+        </div>
       </div>
 
       <Card>

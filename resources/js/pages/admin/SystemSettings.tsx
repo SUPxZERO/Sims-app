@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
+import PageHeader from '../../components/common/PageHeader';
+import systemSettingsBg from '../../assets/system_settings_bg.jpg';
 
 export const SystemSettings: React.FC = () => {
   const [configs, setConfigs] = useState<any[]>([]);
@@ -47,12 +49,12 @@ export const SystemSettings: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">System Configurations</h1>
-          <p className="text-slate-400 text-sm mt-1">Manage global settings and variables for the platform</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="System Configurations" 
+        subtitle="Manage global settings and variables for the platform"
+        mediaType="image"
+        mediaSrc={systemSettingsBg}
+      />
 
       <Card>
         <div className="overflow-x-auto">

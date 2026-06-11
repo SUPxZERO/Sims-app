@@ -66,7 +66,7 @@ export const JobDetailsModal: React.FC<JobDetailsModalProps> = ({ job, cvData, a
               <Badge variant="primary">{job.work_mode}</Badge>
               <Badge variant="info">{job.location}</Badge>
               {job.company_profile?.industry_sector && (
-                <Badge variant="secondary">{job.company_profile.industry_sector}</Badge>
+                <Badge variant="info">{job.company_profile.industry_sector}</Badge>
               )}
             </div>
           </div>

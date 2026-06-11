@@ -6,6 +6,9 @@ import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
 import Modal from '../../components/common/Modal';
 import ApplicationTimeline from '../../components/common/ApplicationTimeline';
+import PageHeader from '../../components/common/PageHeader';
+import emptyStateImg from '../../assets/empty_state.png';
+import applicationsBg from '../../assets/applications_bg.jpg';
 
 export const MyApplications: React.FC = () => {
   const { data, loading, error, refetch } = useFetch<any>('/applications/student', true);
@@ -59,19 +62,19 @@ export const MyApplications: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">My Applications</h1>
-          <p className="text-slate-400">Track the status of your internship applications.</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="My Applications" 
+        subtitle="Track the status of your internship applications."
+        mediaType="image"
+        mediaSrc={applicationsBg}
+      />
 
       <div className="grid grid-cols-1 gap-6">
         {applications.length === 0 ? (
-          <Card>
-            <div className="py-12 text-center text-slate-500">
-              You haven't applied to any internships yet.
-            </div>
+          <Card className="text-center py-16 flex flex-col items-center justify-center">
+            <img src={emptyStateImg} alt="No applications" className="w-64 h-64 object-contain mb-6 opacity-80 mix-blend-screen" />
+            <h3 className="text-xl font-bold text-slate-200 mb-2">No Applications Yet</h3>
+            <p className="text-slate-500 max-w-md mx-auto">You haven't applied to any internships yet. Start exploring the job board to find your next opportunity!</p>
           </Card>
         ) : (
           applications.map((app: any) => (

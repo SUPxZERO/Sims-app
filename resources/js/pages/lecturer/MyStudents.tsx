@@ -8,6 +8,8 @@ import Table from '../../components/common/Table';
 import Modal from '../../components/common/Modal';
 import CvViewer from '../../components/cv/CvViewer';
 import api from '../../services/api';
+import PageHeader from '../../components/common/PageHeader';
+import myStudentsBg from '../../assets/my_students_bg.jpg';
 
 export const MyStudents: React.FC = () => {
   const navigate = useNavigate();
@@ -57,12 +59,12 @@ export const MyStudents: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">My Students</h1>
-          <p className="text-slate-400">View and evaluate the interns assigned to you.</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="My Students" 
+        subtitle="View and evaluate the interns assigned to you."
+        mediaType="image"
+        mediaSrc={myStudentsBg}
+      />
 
       <Card className="flex flex-col">
         <div className="flex-1">

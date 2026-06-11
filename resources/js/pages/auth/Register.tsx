@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
+import bgVideo from '../../assets/bg_video.mp4';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -49,13 +50,17 @@ export const Register: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4 relative overflow-hidden">
-      {/* Background Ornaments */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+      {/* Background Media & Ornaments */}
+      <div className="absolute inset-0 z-0">
+        <video autoPlay loop muted playsInline className="w-full h-full object-cover object-center opacity-30 mix-blend-luminosity">
+          <source src={bgVideo} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40"></div>
         <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-blue-600/10 blur-3xl"></div>
         <div className="absolute top-1/2 -right-20 w-[500px] h-[500px] rounded-full bg-indigo-600/10 blur-3xl"></div>
       </div>
 
-      <div className="w-full max-w-md bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-800 p-8 shadow-2xl z-10">
+      <div className="w-full max-w-md bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-8 shadow-2xl z-10">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-outfit font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500 mb-2">
             Join SUIMS

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
+import PageHeader from '../../components/common/PageHeader';
+import manageSkillsBg from '../../assets/manage_skills_bg.jpg';
 
 export const ManageSkills: React.FC = () => {
   const [categories, setCategories] = useState<any[]>([]);
@@ -78,10 +80,12 @@ export const ManageSkills: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-100">Manage Skills</h1>
-        <p className="text-slate-400 text-sm mt-1">Manage skill categories and individual skills.</p>
-      </div>
+      <PageHeader 
+        title="Manage Skills" 
+        subtitle="Manage skill categories and individual skills."
+        mediaType="image"
+        mediaSrc={manageSkillsBg}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="space-y-6">

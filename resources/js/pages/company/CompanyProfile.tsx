@@ -4,6 +4,7 @@ import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import companyCoverVideo from '../../assets/company_cover_video.mp4';
 
 export const CompanyProfile: React.FC = () => {
   const { data: profileData, loading, refetch } = useFetch<any>('/profile', true);
@@ -69,7 +70,24 @@ export const CompanyProfile: React.FC = () => {
     <div className="space-y-6 pb-12 max-w-4xl">
       <div>
         <h1 className="text-2xl font-bold text-slate-100">Company Profile</h1>
-        <p className="text-slate-400">Manage your organization's details, visible to students when they view your listings.</p>
+        <p className="text-slate-400 mb-6">Manage your organization's details, visible to students when they view your listings.</p>
+        
+        {/* Cover Banner */}
+        <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden mb-6 border border-slate-800 shadow-lg min-h-[300px]">
+          <video autoPlay loop muted playsInline className="w-full h-full object-cover object-center opacity-80">
+            <source src={companyCoverVideo} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent opacity-90"></div>
+          <div className="absolute bottom-4 left-6 flex items-center gap-4">
+            <div className="w-20 h-20 bg-slate-800 rounded-lg border-4 border-slate-950 flex items-center justify-center text-3xl font-bold text-indigo-400 shadow-xl">
+              {formData.company_name ? formData.company_name.charAt(0) : 'C'}
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white shadow-sm">{formData.company_name || 'Your Company Name'}</h2>
+              <p className="text-indigo-300 font-medium">{formData.industry_sector || 'Industry'}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <Card>

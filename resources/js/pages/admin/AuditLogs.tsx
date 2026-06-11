@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import Card from '../../components/common/Card';
+import PageHeader from '../../components/common/PageHeader';
+import auditLogsBg from '../../assets/audit_logs_bg.jpg';
 
 export const AuditLogs: React.FC = () => {
   const [logs, setLogs] = useState<any[]>([]);
@@ -45,10 +47,12 @@ export const AuditLogs: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-100">Audit Logs</h1>
-        <p className="text-slate-400 text-sm mt-1">System-wide history tracking of record changes</p>
-      </div>
+      <PageHeader 
+        title="Audit Logs" 
+        subtitle="System-wide history tracking of record changes"
+        mediaType="image"
+        mediaSrc={auditLogsBg}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">

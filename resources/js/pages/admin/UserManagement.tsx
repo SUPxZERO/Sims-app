@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { Search, Plus, Filter, Shield, User, GraduationCap, Building2, CheckCircle2, XCircle, Clock, Users, Activity, Edit2, Ban, Play, X, Save, Bell } from 'lucide-react';
+import PageHeader from '../../components/common/PageHeader';
+import userManagementVideo from '../../assets/user_management_video.mp4';
 
 export const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -308,16 +310,18 @@ export const UserManagement: React.FC = () => {
       )}
 
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">User Management</h1>
-          <p className="text-slate-400 mt-1 text-sm">Monitor, approve, and manage system users across all roles.</p>
-        </div>
+      <PageHeader 
+        title="User Management" 
+        subtitle="Monitor, approve, and manage system users across all roles."
+        mediaType="video"
+        mediaSrc={userManagementVideo}
+        heightClass="min-h-[250px]"
+      >
         <button type="button" onClick={() => setInvitingUser(true)} className="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-medium rounded-xl shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-105 hover:shadow-blue-500/40">
           <Plus size={18} className="mr-2" />
           Invite New User
         </button>
-      </div>
+      </PageHeader>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

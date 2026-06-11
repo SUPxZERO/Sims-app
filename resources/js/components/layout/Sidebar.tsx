@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import authBg from '../../assets/auth_bg.png';
 
 export const Sidebar: React.FC = () => {
   const { user } = useAuth();
@@ -81,11 +82,17 @@ export const Sidebar: React.FC = () => {
       </nav>
       
       <div className="p-4 border-t border-slate-800">
-        <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/50">
-          <p className="text-xs text-slate-400 font-medium mb-1">System Status</p>
-          <div className="flex items-center text-sm text-green-400">
-            <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
-            All systems operational
+        <div className="relative bg-slate-800/50 rounded-lg p-4 border border-slate-700/50 overflow-hidden">
+          <div className="absolute inset-0 opacity-20">
+            <img src={authBg} alt="Background" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
+          </div>
+          <div className="relative z-10">
+            <p className="text-xs text-slate-300 font-medium mb-1">System Status</p>
+            <div className="flex items-center text-sm text-green-400 font-medium">
+              <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
+              All systems operational
+            </div>
           </div>
         </div>
       </div>

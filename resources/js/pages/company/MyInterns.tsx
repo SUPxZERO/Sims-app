@@ -4,6 +4,8 @@ import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
 import Table from '../../components/common/Table';
+import PageHeader from '../../components/common/PageHeader';
+import myInternsBg from '../../assets/my_interns_bg.jpg';
 import { useNavigate } from 'react-router-dom';
 
 export const MyInterns: React.FC = () => {
@@ -17,10 +19,12 @@ export const MyInterns: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-100">My Interns</h1>
-        <p className="text-slate-400">View and evaluate your assigned interns.</p>
-      </div>
+      <PageHeader 
+        title="My Interns" 
+        subtitle="View and evaluate your assigned interns."
+        mediaType="image"
+        mediaSrc={myInternsBg}
+      />
 
       <Card>
         <Table

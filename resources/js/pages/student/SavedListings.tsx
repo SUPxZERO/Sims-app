@@ -3,10 +3,12 @@ import { createPortal } from 'react-dom';
 import { JobDetailsModal } from '../../components/student/JobDetailsModal';
 import { useFetch } from '../../hooks/useFetch';
 import Card from '../../components/common/Card';
-import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
 import api from '../../services/api';
+import PageHeader from '../../components/common/PageHeader';
+import emptyStateImg from '../../assets/empty_state.png';
+import savedListingsBg from '../../assets/saved_listings_bg.jpg';
 
 // ── Toast notification component ─────────────────────────────────────────────
 interface Toast {
@@ -101,14 +103,18 @@ export const SavedListings: React.FC = () => {
     <div className="space-y-6 max-w-5xl">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       
-      <div>
-        <h1 className="text-2xl font-bold text-slate-100">Saved Internships</h1>
-        <p className="text-slate-400">Internships you have bookmarked for later.</p>
-      </div>
+      <PageHeader 
+        title="Saved Internships" 
+        subtitle="Internships you have bookmarked for later."
+        mediaType="image"
+        mediaSrc={savedListingsBg}
+      />
 
       {savedListings.length === 0 ? (
-        <Card className="text-center py-12">
-          <p className="text-slate-500">You haven't saved any internships yet.</p>
+        <Card className="text-center py-16 flex flex-col items-center justify-center">
+          <img src={emptyStateImg} alt="No saved listings" className="w-64 h-64 object-contain mb-6 opacity-80 mix-blend-screen" />
+          <h3 className="text-xl font-bold text-slate-200 mb-2">No Saved Internships</h3>
+          <p className="text-slate-500 max-w-md mx-auto">You haven't bookmarked any internships yet. Explore the job board and save opportunities that interest you!</p>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

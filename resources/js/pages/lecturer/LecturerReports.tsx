@@ -5,6 +5,8 @@ import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Table from '../../components/common/Table';
 import Spinner from '../../components/common/Spinner';
+import PageHeader from '../../components/common/PageHeader';
+import lecturerReportsVideo from '../../assets/lecturer_reports_video.mp4';
 
 export const LecturerReports: React.FC = () => {
   const navigate = useNavigate();
@@ -37,12 +39,12 @@ export const LecturerReports: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">All Weekly Reports</h1>
-          <p className="text-slate-400">Track and review reports from all your supervised students.</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="All Weekly Reports" 
+        subtitle="Track and review reports from all your supervised students."
+        mediaType="video"
+        mediaSrc={lecturerReportsVideo}
+      />
 
       <Card>
         <div className="flex justify-between items-center mb-6">

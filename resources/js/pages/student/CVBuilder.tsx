@@ -4,6 +4,8 @@ import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import PageHeader from '../../components/common/PageHeader';
+import cvBuilderBg from '../../assets/cv_builder_bg.jpg';
 
 export const CVBuilder: React.FC = () => {
   const [personalSummary, setPersonalSummary] = useState('');
@@ -205,10 +207,12 @@ export const CVBuilder: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-12">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-100">CV Builder</h1>
-        <p className="text-slate-400">Manage your skills and profile to improve match recommendations.</p>
-      </div>
+      <PageHeader 
+        title="CV Builder" 
+        subtitle="Manage your skills and profile to improve match recommendations."
+        mediaType="image"
+        mediaSrc={cvBuilderBg}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">

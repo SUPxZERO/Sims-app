@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
+import PageHeader from '../../components/common/PageHeader';
+import manageGradingBg from '../../assets/manage_grading_bg.jpg';
 
 export const ManageGrading: React.FC = () => {
   const [scales, setScales] = useState<any[]>([]);
@@ -87,12 +89,12 @@ export const ManageGrading: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Manage Grading & Criteria</h1>
-          <p className="text-slate-400 text-sm mt-1">Configure grading scales and evaluation criteria weights</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Manage Grading & Criteria" 
+        subtitle="Configure grading scales and evaluation criteria weights"
+        mediaType="image"
+        mediaSrc={manageGradingBg}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Grading Scales */}

@@ -8,6 +8,7 @@ import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
 import { useFetch } from '../../hooks/useFetch';
 import api from '../../services/api';
+import heroVideo from '../../assets/hero_video.mp4';
 
 // ── Toast notification component ─────────────────────────────────────────────
 interface Toast {
@@ -165,14 +166,22 @@ export const FindJobs: React.FC = () => {
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
       {/* Page header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Find Internships</h1>
-          <p className="text-slate-400">Discover and apply to new opportunities.</p>
+      <div className="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 p-8 md:p-14 shadow-lg min-h-[350px] flex items-end">
+        <div className="absolute inset-0 z-0">
+          <video autoPlay loop muted playsInline className="w-full h-full object-cover object-center opacity-40 mix-blend-screen">
+            <source src={heroVideo} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
         </div>
-        <Button variant="secondary" onClick={handleRefreshScores} disabled={refreshing}>
-          {refreshing ? 'Refreshing…' : '↻  Refresh Match Scores'}
-        </Button>
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Find Internships</h1>
+            <p className="text-blue-200 text-lg">Discover and apply to new opportunities.</p>
+          </div>
+          <Button variant="secondary" onClick={handleRefreshScores} disabled={refreshing} className="backdrop-blur-md bg-white/10 hover:bg-white/20 border-white/20 text-white">
+            {refreshing ? 'Refreshing…' : '↻  Refresh Match Scores'}
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

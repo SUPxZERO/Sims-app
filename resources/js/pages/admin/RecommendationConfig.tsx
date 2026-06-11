@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
+import PageHeader from '../../components/common/PageHeader';
+import recommendationConfigBg from '../../assets/recommendation_config_bg.jpg';
 
 export const RecommendationConfig: React.FC = () => {
   // config variable removed since it was unused
@@ -61,12 +63,12 @@ export const RecommendationConfig: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">AI Recommendation Engine</h1>
-          <p className="text-slate-400 text-sm mt-1">Configure weights and thresholds for internship matching</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="AI Recommendation Engine" 
+        subtitle="Configure weights and thresholds for internship matching"
+        mediaType="image"
+        mediaSrc={recommendationConfigBg}
+      />
 
       <Card>
         <form onSubmit={handleSave} className="space-y-6">

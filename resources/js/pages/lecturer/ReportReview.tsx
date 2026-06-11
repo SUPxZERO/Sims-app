@@ -4,6 +4,8 @@ import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
+import PageHeader from '../../components/common/PageHeader';
+import reportReviewBg from '../../assets/report_review_bg.jpg';
 
 export const ReportReview: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -81,7 +83,12 @@ export const ReportReview: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="flex items-center gap-4">
+      <PageHeader 
+        title="Review Weekly Report" 
+        subtitle={`${report.internship?.student_profile?.user?.full_name || 'Student'} • Week ${report.week_number}`}
+        mediaType="image"
+        mediaSrc={reportReviewBg}
+      >
         <button 
           onClick={() => navigate('/lecturer/dashboard')}
           className="p-2 bg-slate-800 text-slate-300 hover:text-white rounded-full transition-colors"
@@ -90,11 +97,7 @@ export const ReportReview: React.FC = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
           </svg>
         </button>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Review Weekly Report</h1>
-          <p className="text-slate-400">{report.internship?.student_profile?.user?.full_name || 'Student'} • Week {report.week_number}</p>
-        </div>
-      </div>
+      </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">

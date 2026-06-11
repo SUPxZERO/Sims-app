@@ -9,6 +9,8 @@ import CvViewer from '../../components/cv/CvViewer';
 import Modal from '../../components/common/Modal';
 import ApplicationTimeline from '../../components/common/ApplicationTimeline';
 import ScheduleInterviewModal from './ScheduleInterviewModal';
+import PageHeader from '../../components/common/PageHeader';
+import applicationsBg from '../../assets/applications_bg.jpg';
 
 export const ReviewApplications: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -71,18 +73,19 @@ export const ReviewApplications: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <button 
-            onClick={() => navigate('/company/listings')}
-            className="text-slate-400 hover:text-slate-300 text-sm flex items-center mb-2 transition-colors"
-          >
-            &larr; Back to Listings
-          </button>
-          <h1 className="text-2xl font-bold text-slate-100">Review Applicants</h1>
-          <p className="text-slate-400">Review and manage candidates for this listing.</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Review Applicants" 
+        subtitle="Review and manage candidates for this listing."
+        mediaType="image"
+        mediaSrc={applicationsBg}
+      >
+        <button 
+          onClick={() => navigate('/company/listings')}
+          className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors border border-slate-700"
+        >
+          &larr; Back to Listings
+        </button>
+      </PageHeader>
 
       <div className="grid grid-cols-1 gap-6">
         {applications.length === 0 ? (

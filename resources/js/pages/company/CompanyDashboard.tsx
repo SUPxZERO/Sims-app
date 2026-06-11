@@ -5,6 +5,8 @@ import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
+import PageHeader from '../../components/common/PageHeader';
+import companyDashVideo from '../../assets/company_dash_video.mp4';
 import { useNavigate } from 'react-router-dom';
 import {
   Chart as ChartJS,
@@ -73,13 +75,15 @@ export const CompanyDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Company Dashboard</h1>
-          <p className="text-slate-400">Manage your listings and review applicants.</p>
-        </div>
+      <PageHeader 
+        title="Company Dashboard" 
+        subtitle="Manage your listings and review applicants."
+        mediaType="video"
+        mediaSrc={companyDashVideo}
+        heightClass="min-h-[250px]"
+      >
         <Button onClick={() => navigate('/company/listings/new')}>Create New Listing</Button>
-      </div>
+      </PageHeader>
 
       {/* KPI Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

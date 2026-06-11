@@ -5,6 +5,8 @@ import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import PageHeader from '../../components/common/PageHeader';
+import listingApprovalsBg from '../../assets/listing_approvals_bg.jpg';
 
 export const ListingApprovals: React.FC = () => {
   const { data, loading, error, refetch } = useFetch<any>('/listings?status=PENDING_APPROVAL', true);
@@ -60,12 +62,12 @@ export const ListingApprovals: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Listing Approvals</h1>
-          <p className="text-slate-400">Review and approve job listings submitted by companies.</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Listing Approvals" 
+        subtitle="Review and approve job listings submitted by companies."
+        mediaType="image"
+        mediaSrc={listingApprovalsBg}
+      />
 
       <div className="grid grid-cols-1 gap-6">
         {listings.length === 0 ? (

@@ -5,6 +5,8 @@ import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import PageHeader from '../../components/common/PageHeader';
+import createListingBg from '../../assets/create_listing_bg.jpg';
 
 export const CreateListing: React.FC = () => {
   const navigate = useNavigate();
@@ -71,20 +73,16 @@ export const CreateListing: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <button 
-          onClick={() => navigate('/company/dashboard')}
-          className="p-2 bg-slate-800 text-slate-300 hover:text-white rounded-full transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-          </svg>
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Create Internship Listing</h1>
-          <p className="text-slate-400">Post a new opportunity to attract top university talent.</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Create Internship Listing" 
+        subtitle="Post a new opportunity to attract top university talent."
+        mediaType="image"
+        mediaSrc={createListingBg}
+      >
+        <Button variant="secondary" onClick={() => navigate('/company/dashboard')}>
+          Back to Dashboard
+        </Button>
+      </PageHeader>
 
       <form onSubmit={handleSubmit}>
         <Card className="space-y-6">

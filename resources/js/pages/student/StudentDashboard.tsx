@@ -16,6 +16,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import studentDashVideo from '../../assets/student_dash_video.mp4';
 
 ChartJS.register(
   CategoryScale,
@@ -69,9 +70,17 @@ export const StudentDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-100">Welcome back, {user?.full_name?.split(' ')[0]}</h1>
-        <p className="text-slate-400">Here's your internship overview</p>
+      <div className="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 p-8 shadow-lg min-h-[350px] flex items-end">
+        <div className="absolute inset-0 z-0">
+          <video autoPlay loop muted playsInline className="w-full h-full object-cover object-center opacity-30 mix-blend-screen">
+            <source src={studentDashVideo} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
+        </div>
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold text-white mb-2">Welcome back, {user?.full_name?.split(' ')[0]} 👋</h1>
+          <p className="text-blue-200">Here's your internship overview</p>
+        </div>
       </div>
 
       {/* KPI Grid */}
