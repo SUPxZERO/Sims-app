@@ -37,10 +37,10 @@ export function Table<T>({ data, columns, keyExtractor, emptyMessage = 'No data 
               </td>
             </tr>
           ) : (
-            data.map((row) => (
-              <tr key={keyExtractor(row)} className="hover:bg-slate-800/30 transition-colors">
-                {columns.map((col, index) => (
-                  <td key={index} className={`px-6 py-4 whitespace-nowrap text-slate-300 ${col.className || ''}`}>
+            data.map((row, index) => (
+              <tr key={keyExtractor(row)} className="hover:bg-slate-800/30 transition-colors duration-200 stagger-item" style={{ animationDelay: `${index * 30}ms` }}>
+                {columns.map((col, colIndex) => (
+                  <td key={colIndex} className={`px-6 py-4 whitespace-nowrap text-slate-300 ${col.className || ''}`}>
                     {typeof col.accessor === 'function' ? col.accessor(row) : ((row as any)[col.accessor as string] as React.ReactNode)}
                   </td>
                 ))}

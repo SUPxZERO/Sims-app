@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { Search, Plus, Filter, Shield, User, GraduationCap, Building2, CheckCircle2, XCircle, Clock, Users, Activity, Edit2, Ban, Play, X, Save, Bell } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
+import SkeletonDashboardLayout from '../../components/common/SkeletonDashboardLayout';
 import userManagementVideo from '../../assets/user_management_video.mp4';
 
 export const UserManagement: React.FC = () => {
@@ -126,6 +127,10 @@ export const UserManagement: React.FC = () => {
   const activeUsers = usersData.filter(u => u.status === 'ACTIVE').length;
   const inactiveUsers = usersData.filter(u => u.status === 'INACTIVE').length;
   const lockedUsers = usersData.filter(u => u.status === 'LOCKED').length;
+
+  if (isLoading) {
+    return <SkeletonDashboardLayout />;
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 relative">

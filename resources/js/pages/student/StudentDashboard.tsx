@@ -4,8 +4,8 @@ import { useFetch } from '../../hooks/useFetch';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
-import Spinner from '../../components/common/Spinner';
 import Table from '../../components/common/Table';
+import SkeletonDashboardLayout from '../../components/common/SkeletonDashboardLayout';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -33,11 +33,7 @@ export const StudentDashboard: React.FC = () => {
   const { data: interviewData } = useFetch<any>('/student/interviews', true);
 
   if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    );
+    return <SkeletonDashboardLayout />;
   }
 
   if (error) {

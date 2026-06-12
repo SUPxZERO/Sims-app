@@ -10,16 +10,16 @@ export const Input: React.FC<InputProps> = ({ label, error, className = '', id, 
   return (
     <div className="w-full">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-slate-300 mb-1">
+        <label htmlFor={id} className="block text-sm font-medium text-slate-300 mb-1 transition-colors duration-200">
           {label}
         </label>
       )}
       <input
         id={id}
-        className={`input-field ${error ? 'border-red-500 focus:ring-red-500' : ''} ${className}`}
+        className={`input-field ${error ? 'border-red-500 focus:ring-red-500' : ''} focus:border-blue-400 ${className}`}
         {...props}
       />
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+      {error && <p className="mt-1 text-sm text-red-500 animate-slideUp">{error}</p>}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Badge from '../../components/common/Badge';
-import Spinner from '../../components/common/Spinner';
+import SkeletonJobCard from '../../components/common/SkeletonJobCard';
 import { useFetch } from '../../hooks/useFetch';
 import api from '../../services/api';
 import heroVideo from '../../assets/hero_video.mp4';
@@ -138,8 +138,28 @@ export const FindJobs: React.FC = () => {
 
   // ── Loading / error states ──────────────────────────────────────────────────
   if (loading) return (
-    <div className="flex h-full items-center justify-center">
-      <Spinner size="lg" />
+    <div className="space-y-6">
+      <div className="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 p-8 md:p-14 shadow-lg min-h-[350px] flex items-end">
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
+          <div className="w-full">
+            <div className="h-8 bg-slate-800/50 rounded-lg mb-3 w-1/3 animate-pulse" />
+            <div className="h-5 bg-slate-800/50 rounded-lg w-1/2 animate-pulse" />
+          </div>
+        </div>
+      </div>
+
+      <Card className="!p-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 h-10 bg-slate-800/50 rounded-lg animate-pulse" />
+          <div className="w-full md:w-48 h-10 bg-slate-800/50 rounded-lg animate-pulse" />
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <SkeletonJobCard key={i} />
+        ))}
+      </div>
     </div>
   );
 
@@ -211,13 +231,14 @@ export const FindJobs: React.FC = () => {
 
       {/* Job cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredJobs.map((job: any) => {
+        {filteredJobs.map((job: any, index: number) => {
           const match = job.match_score != null ? Math.round(job.match_score) : null;
           return (
             <Card
               key={job.listing_id}
-              className="flex flex-col hover:border-blue-500/50 transition-colors cursor-pointer group"
+              className="flex flex-col hover:border-blue-500/50 transition-colors cursor-pointer group stagger-item"
               onClick={() => setSelectedJob(job)}
+              style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1 pr-3">

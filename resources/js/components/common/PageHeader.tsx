@@ -34,7 +34,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       </div>
       
       {/* Content Overlay */}
-      <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end w-full gap-4">
+      <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end w-full gap-4 animate-slideUp">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-100 font-outfit">{title}</h1>
           {subtitle && <p className="text-slate-400 text-lg max-w-2xl">{subtitle}</p>}
