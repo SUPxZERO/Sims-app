@@ -4,12 +4,12 @@ import { useFetch } from '../../hooks/useFetch';
 import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
-import Spinner from '../../components/common/Spinner';
 import CvViewer from '../../components/cv/CvViewer';
 import Modal from '../../components/common/Modal';
 import ApplicationTimeline from '../../components/common/ApplicationTimeline';
 import ScheduleInterviewModal from './ScheduleInterviewModal';
 import PageHeader from '../../components/common/PageHeader';
+import SkeletonDashboardLayout from '../../components/common/SkeletonDashboardLayout';
 import applicationsBg from '../../assets/applications_bg.jpg';
 
 export const ReviewApplications: React.FC = () => {
@@ -22,11 +22,7 @@ export const ReviewApplications: React.FC = () => {
   const [interviewAppId, setInterviewAppId] = useState<number | null>(null);
 
   if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    );
+    return <SkeletonDashboardLayout />;
   }
 
   if (error) {

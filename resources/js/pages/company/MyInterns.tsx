@@ -2,9 +2,9 @@ import React from 'react';
 import { useFetch } from '../../hooks/useFetch';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
-import Spinner from '../../components/common/Spinner';
 import Table from '../../components/common/Table';
 import PageHeader from '../../components/common/PageHeader';
+import SkeletonDashboardLayout from '../../components/common/SkeletonDashboardLayout';
 import myInternsBg from '../../assets/my_interns_bg.jpg';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,7 +12,7 @@ export const MyInterns: React.FC = () => {
   const navigate = useNavigate();
   const { data, loading, error } = useFetch<any>('/internships', true);
 
-  if (loading) return <div className="flex justify-center p-8"><Spinner size="lg" /></div>;
+  if (loading) return <SkeletonDashboardLayout />;
   if (error) return <div className="text-red-400 p-4 bg-red-500/10 rounded-lg">{error}</div>;
 
   const internships = data?.internships || [];

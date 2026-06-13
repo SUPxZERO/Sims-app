@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
-import Spinner from '../../components/common/Spinner';
 import Table from '../../components/common/Table';
 import Modal from '../../components/common/Modal';
+import Spinner from '../../components/common/Spinner';
 import CvViewer from '../../components/cv/CvViewer';
 import api from '../../services/api';
 import PageHeader from '../../components/common/PageHeader';
+import SkeletonDashboardLayout from '../../components/common/SkeletonDashboardLayout';
 import myStudentsBg from '../../assets/my_students_bg.jpg';
 
 export const MyStudents: React.FC = () => {
@@ -21,11 +22,7 @@ export const MyStudents: React.FC = () => {
   const { data, loading, error } = useFetch<any>('/internships', true);
 
   if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    );
+    return <SkeletonDashboardLayout />;
   }
 
   if (error) {

@@ -3,20 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
-import Spinner from '../../components/common/Spinner';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
+import SkeletonDashboardLayout from '../../components/common/SkeletonDashboardLayout';
 
 export const ManageListings: React.FC = () => {
   const navigate = useNavigate();
   const { data, loading, error } = useFetch<any>('/dashboard', true);
 
   if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    );
+    return <SkeletonDashboardLayout />;
   }
 
   if (error) {
