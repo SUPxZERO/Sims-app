@@ -19,6 +19,8 @@ return new class extends Migration
             $table->json('preferred_industries')->nullable();
             $table->timestamps();
         });
+        
+        \Illuminate\Support\Facades\DB::statement('CREATE SEQUENCE seq_student_preferences START WITH 1 INCREMENT BY 1 NOCYCLE CACHE 20');
     }
 
     /**
@@ -27,5 +29,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('student_preferences');
+        \Illuminate\Support\Facades\DB::statement('DROP SEQUENCE seq_student_preferences');
     }
 };

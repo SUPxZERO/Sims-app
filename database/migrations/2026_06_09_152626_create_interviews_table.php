@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('status', 20)->default('SCHEDULED');
             $table->timestamps();
         });
+        
+        \Illuminate\Support\Facades\DB::statement('CREATE SEQUENCE seq_interviews START WITH 1 INCREMENT BY 1 NOCYCLE CACHE 20');
     }
 
     /**
@@ -29,5 +31,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('interviews');
+        \Illuminate\Support\Facades\DB::statement('DROP SEQUENCE seq_interviews');
     }
 };
