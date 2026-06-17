@@ -49,6 +49,7 @@ import RecommendationConfig from '../pages/admin/RecommendationConfig';
 import ManageSkills from '../pages/admin/ManageSkills';
 import SendNotification from '../pages/admin/SendNotification';
 import AuditLogs from '../pages/admin/AuditLogs';
+import SupervisionAssignments from '../pages/admin/SupervisionAssignments';
 
 const HomeRedirect: React.FC = () => {
   const { user } = useAuth();
@@ -113,6 +114,7 @@ export const AppRoutes: React.FC = () => {
         {/* ADMIN Pathways */}
         <Route path="admin/dashboard" element={<ProtectedRoute allowedRoles={['ADMIN']}><AdminDashboard /></ProtectedRoute>} />
         <Route path="admin/users" element={<ProtectedRoute allowedRoles={['ADMIN']}><UserManagement /></ProtectedRoute>} />
+        <Route path="admin/supervisions" element={<ProtectedRoute allowedRoles={['ADMIN']}><SupervisionAssignments /></ProtectedRoute>} />
         <Route path="admin/approvals" element={<ProtectedRoute allowedRoles={['ADMIN']}><ListingApprovals /></ProtectedRoute>} />
         <Route path="admin/system-settings" element={<ProtectedRoute allowedRoles={['ADMIN']}><SystemSettings /></ProtectedRoute>} />
         <Route path="admin/grading" element={<ProtectedRoute allowedRoles={['ADMIN']}><ManageGrading /></ProtectedRoute>} />

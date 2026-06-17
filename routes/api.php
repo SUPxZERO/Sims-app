@@ -204,6 +204,13 @@ Route::middleware('auth.jwt')->group(function () {
         Route::delete('/{id}', [SkillController::class, 'destroy']);
     });
 
+    Route::prefix('admin/supervisions')->group(function () {
+        Route::get('/', [\App\Http\Controllers\SupervisionController::class, 'index']);
+        Route::get('/lecturers', [\App\Http\Controllers\SupervisionController::class, 'getLecturers']);
+        Route::put('/{internshipId}', [\App\Http\Controllers\SupervisionController::class, 'assignSupervisor']);
+        Route::post('/bulk-assign', [\App\Http\Controllers\SupervisionController::class, 'bulkAssign']);
+    });
+
     Route::post('admin/notifications', [NotificationController::class, 'store']);
     Route::get('admin/audit-logs', [AuditLogController::class, 'index']);
 });

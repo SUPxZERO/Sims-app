@@ -123,15 +123,15 @@ class ApplicationService
                 // Triggers handle the internship creation and auto-withdrawal of other applications,
                 // but we might want to manually invoke or verify them here if needed.
                 // We'll create the internship record explicitly to be safe if trigger doesn't do it.
-                // Auto-assign a lecturer (for demo purposes)
-                $lecturer = \App\Models\User::where('role', 'LECTURER')->first() ?? \App\Models\User::where('role', 'ADMIN')->first();
+                // Smart auto-assign: pick the least-loaded lecturer who hasn't hit capacity
+                $lecturer = \App\Http\Controllers\SupervisionController::findLeastLoadedLecturer();
 
                 Internship::create([
                     'application_id' => $application->application_id,
                     'student_user_id' => $application->user_id,
                     'listing_id' => $application->listing_id,
                     'company_user_id' => $application->listing->company_user_id,
-                    'lecturer_user_id' => $lecturer->user_id,
+                    'lecturer_user_id' => $lecturer ? $lecturer->user_id : null,
                     'status' => 'ACTIVE',
                     'start_date' => now(),
                     'end_date' => now()->addWeeks($application->listing->duration_weeks),
