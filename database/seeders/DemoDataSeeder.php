@@ -30,6 +30,8 @@ class DemoDataSeeder extends Seeder
             return;
         }
 
+        $this->createShowcaseInternship();
+
         // 1. Recommendations and Applications
         foreach ($students as $student) {
             $cv = \App\Models\Cv::where('user_id', $student->user_id)->first();
@@ -163,6 +165,85 @@ class DemoDataSeeder extends Seeder
                             'internship_id' => $internship->internship_id,
                         ]);
                     }
+                }
+            }
+        }
+    }
+
+    private function createShowcaseInternship(): void
+    {
+        $student = User::where('email', 'student@suims.edu')->first();
+        $company = User::where('email', 'company@suims.edu')->first();
+        $lecturer = User::where('email', 'lecturer@suims.edu')->first();
+
+        if (!$student || !$company || !$lecturer) return;
+
+        $cv = \App\Models\Cv::where('user_id', $student->user_id)->first();
+        if (!$cv) return;
+        $cvVersion = $cv->versions()->first();
+
+        $listing = InternshipListing::factory()->create([
+            'company_user_id' => $company->user_id,
+            'title' => 'Software Engineering Intern (Showcase)',
+            'status' => 'PUBLISHED',
+            'quota' => 5,
+        ]);
+
+        $application = Application::factory()->create([
+            'user_id' => $student->user_id,
+            'listing_id' => $listing->listing_id,
+            'cv_version_id' => $cvVersion->cv_version_id,
+            'status' => 'CONFIRMED',
+        ]);
+        
+        ApplicationStatusHistory::factory()->create([
+            'application_id' => $application->application_id,
+            'to_status' => 'CONFIRMED',
+            'changed_by' => $student->user_id,
+        ]);
+
+        $internship = Internship::factory()->create([
+            'application_id' => $application->application_id,
+            'student_user_id' => $student->user_id,
+            'company_user_id' => $company->user_id,
+            'lecturer_user_id' => $lecturer->user_id,
+            'listing_id' => $listing->listing_id,
+        ]);
+
+        $reports = WeeklyReport::where('internship_id', $internship->internship_id)
+            ->orderBy('week_number', 'asc')
+            ->get();
+            
+        $statuses = [
+            1 => 'APPROVED',
+            2 => 'APPROVED',
+            3 => 'SUBMITTED',
+            4 => 'REVISION_REQUESTED',
+            5 => 'REJECTED',
+            6 => 'DRAFT',
+        ];
+
+        foreach ($reports as $report) {
+            $week = $report->week_number;
+            if (isset($statuses[$week])) {
+                $status = $statuses[$week];
+                $report->update([
+                    'activities' => 'Showcase activities for week ' . $week . '. Working heavily on the new features as requested.',
+                    'challenges' => 'Showcase challenges for week ' . $week . '. Encountered some issues with the database indexing.',
+                    'learnings' => 'Showcase learnings for week ' . $week . '. Learned how to optimize the queries properly.',
+                    'hours_logged' => 40,
+                    'status' => $status,
+                    'submitted_at' => in_array($status, ['SUBMITTED', 'APPROVED', 'REVISION_REQUESTED', 'REJECTED']) ? now() : null,
+                    'approved_at' => $status === 'APPROVED' ? now() : null,
+                ]);
+
+                if (in_array($status, ['APPROVED', 'REVISION_REQUESTED', 'REJECTED'])) {
+                    ReportReview::factory()->create([
+                        'report_id' => $report->report_id,
+                        'reviewer_user_id' => $lecturer->user_id,
+                        'decision' => $status,
+                        'comments' => 'Showcase review comment for ' . $status,
+                    ]);
                 }
             }
         }

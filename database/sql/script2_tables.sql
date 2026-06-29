@@ -719,7 +719,7 @@ CREATE TABLE report_attachments (
     CONSTRAINT pk_report_attachments PRIMARY KEY (attachment_id),
     CONSTRAINT fk_rattach_reports FOREIGN KEY (report_id)
         REFERENCES weekly_reports (report_id) ON DELETE CASCADE,
-    CONSTRAINT chk_rattach_size CHECK (file_size_bytes BETWEEN 1 AND 5242880)
+    CONSTRAINT chk_rattach_size CHECK (file_size_bytes BETWEEN 1 AND 31457280)
 );
 
 -- -------------------- report_reviews --------------------

@@ -26,11 +26,7 @@ export const WeeklyReports: React.FC = () => {
 
     try {
       const id = selectedReport.report_id || selectedReport.id;
-      await api.post(`/reports/${id}/attachments`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      await api.post(`/reports/${id}/attachments`, formData);
       
       const res = await api.get('/reports/my');
       setReports(res.data.reports || []);
@@ -87,7 +83,23 @@ export const WeeklyReports: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await api.get('/reports/my');
-      setReports(response.data.reports || []);
+      const fetchedReports = response.data.reports || [];
+      setReports(fetchedReports);
+      
+      // Auto-select a report to improve UX
+      if (fetchedReports.length > 0) {
+        // Find the first report that needs attention
+        const activeReport = fetchedReports.find((r: any) => 
+          r.status === 'NOT_STARTED' || r.status === 'DRAFT' || r.status === 'REVISION_REQUESTED'
+        );
+        
+        if (activeReport) {
+          handleEditClick(activeReport);
+        } else if (!selectedReport) {
+          // If all are submitted/approved and nothing is selected, select the latest one
+          handleEditClick(fetchedReports[fetchedReports.length - 1]);
+        }
+      }
     } catch (error) {
       console.error('Error fetching reports:', error);
     } finally {
@@ -332,8 +344,12 @@ export const WeeklyReports: React.FC = () => {
                 )}
               </form>
             ) : (
-              <div className="text-center py-8 text-slate-500">
-                <p>Click "Edit" or "View" on a report to see details here.</p>
+              <div className="text-center py-12 text-slate-500 bg-slate-800/30 rounded-lg border border-slate-700/50">
+                <svg className="w-16 h-16 mx-auto text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p className="text-lg font-medium text-slate-400">No Report Selected</p>
+                <p className="mt-2 text-sm px-4">Please select a report from the Submission History list on the left to view or edit details.</p>
               </div>
             )}
           </Card>

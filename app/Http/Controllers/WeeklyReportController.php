@@ -106,8 +106,20 @@ class WeeklyReportController extends Controller
     {
         $user = $request->user();
 
+        // Debugging the file upload error
+        \Log::info('--- File Upload Attempt ---');
+        \Log::info('Has file? ' . ($request->hasFile('file') ? 'Yes' : 'No'));
+        \Log::info('Files array keys: ' . implode(', ', array_keys($_FILES)));
+        \Log::info('Post array keys: ' . implode(', ', array_keys($_POST)));
+        
+        if ($request->hasFile('file')) {
+            \Log::info('Is Valid? ' . ($request->file('file')->isValid() ? 'Yes' : 'No'));
+            \Log::error('File upload error code: ' . $request->file('file')->getError());
+            \Log::error('File upload error message: ' . $request->file('file')->getErrorMessage());
+        }
+
         $request->validate([
-            'file' => 'required|file|max:5120', // Max 5MB
+            'file' => 'required|file|max:30720', // Max 30MB
         ]);
 
         try {
