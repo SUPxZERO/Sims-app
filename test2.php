@@ -1,7 +1,17 @@
 <?php
-require 'vendor/autoload.php';
-$app = require_once 'bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-$kernel->bootstrap();
+require "vendor/autoload.php";
+$app = require_once "bootstrap/app.php";
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
-echo json_encode(\DB::select("SELECT search_condition FROM user_constraints WHERE constraint_name = 'CHK_NOTIF_PRIORITY'"));
+// Login as student
+$user = App\Models\User::where("email", "student@suims.edu")->first();
+$token = auth()->login($user);
+
+// Fetch the download
+$request = Illuminate\Http\Request::create("/api/reports/attachments/151/download", "GET");
+$request->headers->set("Authorization", "Bearer " . $token);
+$response = $kernel->handle($request);
+
+echo "Status: " . $response->getStatusCode() . "\n";
+echo "Type: " . get_class($response) . "\n";
+

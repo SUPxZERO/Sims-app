@@ -19,3 +19,5 @@ Route::get('{any}', function () {
 
 // API routes are handled by routes/api.php with /api prefix
 // Web routes starting with /api will NOT match this catchall
+
+

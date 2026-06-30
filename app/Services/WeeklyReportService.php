@@ -208,7 +208,7 @@ class WeeklyReportService
             throw new Exception("File not found on disk.", 404);
         }
 
-        return response()->download(Storage::disk('local')->path($attachment->file_path), $attachment->file_name);
+        return Storage::disk('local')->download($attachment->file_path, $attachment->file_name);
     }
 
     /**
